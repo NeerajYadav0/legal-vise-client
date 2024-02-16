@@ -7,7 +7,7 @@ import Signup from "./pages/Signup";
 
 function App() {
   return (
-    <div className="bg-richblack-900 h-screen w-screen">
+    <div className="bg-black h-screen w-screen">
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
