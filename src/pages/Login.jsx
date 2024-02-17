@@ -1,9 +1,8 @@
-import React, { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useContext, useState } from "react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-
 import {
   Card,
   CardContent,
@@ -14,75 +13,50 @@ import {
 } from "@/components/ui/card";
 
 import { Label } from "@/components/ui/label";
+import { UserContext } from "@/context/UserContext";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const { login } = useContext(UserContext);
 
   const welcomeImage =
     "https://t3.ftcdn.net/jpg/05/75/22/58/360_F_575225818_PQ2ZPHFw51yCcmieutB5bT843nPAPzo3.jpg";
 
-  const handleLogin = () => {
-    console.log("Logging in...", { username, password });
+  //   const handleLogin = () => {
+  //     console.log("Logging in...", { username, password });
+  //   };
+
+  const loginHandler = (username, password) => {
+    if (username.length === 0 || password.length === 0) {
+      toast.error("All Fieds are required");
+    } else {
+      login(username, password);
+    }
   };
 
   return (
-    <div className="">
-      <div className="flex relative items-center justify-center h-[90vh]">
-        <div className="flex h-[80%]">
+    <div className="p-0">
+      <div className="flex relative items-center justify-center h-screen">
+        <div className="h-[75%] hidden md:flex">
           <img src={welcomeImage} alt="" />
         </div>
-
-        {/* <div className="flex-1 flex items-center justify-center h-[80%] ">
-          <div className="backdrop-blur-md p-7 h-[100%] w-full ">
-            <h2 className="text-2xl font-semibold text-white mb-6">Login</h2>
-            <div className="flex justify-center">
-              
-            </div>
-            <form>
-              <div className="mb-4">
-                <label
-                  htmlFor="username"
-                  className="text-white block text-sm font-medium mb-2"
-                >
-                  Username:
-                </label>
-                
-              </div>
-
-              <div className="mb-4">
-                <label
-                  htmlFor="password"
-                  className="text-white block text-sm font-medium mb-2"
-                >
-                  Password:
-                </label>
-               
-              </div>
-              <div className="flex justify-center">
-                <Button type="button" onClick={handleLogin}>
-                  Login
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div> */}
-
-        <Card className="w-[35%] h-[80%] rounded-none flex justify-center flex-col items-center gap-y-3">
-          <CardHeader className="w-[100%]">
+        <Card className="w-screen lg:w-[35%] p-0 h-screen md:h-[75%] rounded-none flex justify-center flex-col gap-y-3">
+          <CardHeader className="w-fit">
             <CardTitle>Welcome Back</CardTitle>
             <CardDescription>
               Login to manage your legal matters efficiently.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form>
-              <div className="grid w-full items-center gap-4">
-                <div className="flex flex-col space-y-1.5">
+            <form onSubmit={(e) => e.preventDefault()}>
+              <div className="grid w-[100%] items-center gap-4 ">
+                <div className="flex flex-col space-y-1.5 ">
                   <Tabs
                     defaultValue="account"
-                    className="w-[400px] text-center"
+                    className=" w-[100%] text-center"
                   >
                     <TabsList>
                       <TabsTrigger value="account">Lawyer</TabsTrigger>
@@ -90,10 +64,10 @@ const Login = () => {
                     </TabsList>
                   </Tabs>
                   <Label htmlFor="name">
-                    Name <sup>*</sup>
+                    E-mail <sup>*</sup>
                   </Label>
                   <Input
-                    type="text"
+                    type="email"
                     id="username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
@@ -123,13 +97,18 @@ const Login = () => {
                   </div>
                 </div>
               </div>
+              <CardFooter className="flex justify-center mt-10">
+                <div className="flex justify-center">
+                  <Button
+                    className="w-32"
+                    onClick={() => loginHandler(username, password)}
+                  >
+                    Login
+                  </Button>
+                </div>
+              </CardFooter>
             </form>
           </CardContent>
-          <CardFooter className="flex justify-between">
-            <div className="flex justify-center">
-              <Button className="w-32">Login</Button>
-            </div>
-          </CardFooter>
         </Card>
       </div>
     </div>
