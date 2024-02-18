@@ -5,7 +5,7 @@ import { NavbarLinks } from "@/data/NavbarLinks";
 function Navbar() {
   const navigate = useNavigate();
   return (
-    <div className="p-3 text-white bg-black  justify-center items-center flex shadow-[0px_0px_5px_0px] shadow-slate-300 ">
+    <div className="h-[9%] text-white bg-black  justify-center items-center flex shadow-[0px_0px_5px_0px] shadow-slate-300 ">
       <div className="w-11/12 flex justify-evenly">
         <div className="w-[25%]">
           <Link to={"/"}>

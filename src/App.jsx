@@ -4,6 +4,7 @@ import Navbar from "./components/ui/common/Navbar";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+// import Footer from "./components/ui/common/Footer";
 
 function App() {
   return (

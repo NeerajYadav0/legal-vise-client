@@ -1,0 +1,11 @@
+.signup-bg-img{
+    background-image: url("./assets/images/signup-bg.jpg");
+    background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.signupOpacity{
+    /* background: rgba(300, 300, 300, 0.5); */
+    background: rgba(0, 0, 0, 0.8);
+}
