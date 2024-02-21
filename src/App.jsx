@@ -6,6 +6,7 @@ import Signup from "./pages/Signup";
 import Footer from "./components/common/Footer";
 import Navbar from "./components/common/Navbar";
 import Error from "./components/common/Error";
+// import Footer from "./components/ui/common/Footer";
 
 function App() {
   return (
