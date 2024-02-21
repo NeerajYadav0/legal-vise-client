@@ -167,8 +167,8 @@ function Signup() {
   };
 
   return (
-    <div className=" h-auto md:h-[90%] ">
-      <div className="text-white  flex justify-center signup-bg-img h-[100%] max-w-[100%] ">
+    <div className=" h-auto md:h-[90%]">
+      <div className="text-white  flex justify-center signup-bg-img h-[100%] max-w-[100%] md:py-10">
         <div className="w-11/12 flex justify-center text-center my-auto h-full">
           <div className=" w-full md:w-[80%]  h-[100%] md:h-[620px] flex  my-auto  signupOpacity   rounded-lg shadow-black shadow-lg">
             <div className=" w-[50%] hidden md:flex h-full ">
