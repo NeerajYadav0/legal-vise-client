@@ -7,6 +7,7 @@ import Footer from "./components/common/Footer";
 import Navbar from "./components/common/Navbar";
 import Error from "./components/common/Error";
 // import Footer from "./components/ui/common/Footer";
+import MyProfile from "./pages/MyProfile";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/error" element={<Error />} />
+        <Route path="/my-profile" element={<MyProfile />} />
       </Routes>
       <Footer />
     </div>
