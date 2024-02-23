@@ -1,14 +1,26 @@
+import React, { useState, useEffect } from "react";
 import HighlightText from "../components/common/HighlightText";
+import Autoplay from "embla-carousel-autoplay";
 import video from "../assets/video/homeVideo.mp4";
-import img1 from "../assets/images/homePageImg1.jpg";
+import img2 from "../assets/images/Home.png";
+import img3 from "../assets/images/Law.png";
+import img4 from "../assets/images/Law Firm.png";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { UserContext } from "@/context/UserContext";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 function Home() {
   const navigate = useNavigate();
   const { loading } = useContext(UserContext);
+
   return (
     <div className="flex flex-col items-center mt-24 w-11/12 mx-auto">
       <div className="w-[100%] text-center">
@@ -58,14 +70,50 @@ function Home() {
             </Button>
           </div>
         </div>
-        <div>
-          <img
-            src={img1}
-            alt=""
-            width={500}
-            className="object-contain shadow-[10px_-5px_10px_-5px] shadow-blue-200"
-            loading="lazy"
-          />
+        <div className="w-1/2 ">
+          <Carousel
+            plugins={[
+              Autoplay({
+                delay: 3000,
+              }),
+            ]}
+            className=" shadow-[10px_-5px_10px_-5px] shadow-blue-200"
+            opts={{
+              align: "start",
+              loop: true,
+
+              // interval={5000};
+            }}
+          >
+            <CarouselContent>
+              <CarouselItem>
+                <img
+                  width={600}
+                  src={img2}
+                  alt="Image 2"
+                  className="w-full h-full object-cover transition-transform transform hover:scale-105 duration-300"
+                />
+              </CarouselItem>
+              <CarouselItem>
+                <img
+                  width={600}
+                  src={img3}
+                  alt="Image 3"
+                  className="w-full h-full object-cover transition-transform transform hover:scale-105 duration-300"
+                />
+              </CarouselItem>
+              <CarouselItem>
+                <img
+                  width={600}
+                  src={img4}
+                  alt="Image 4"
+                  className="w-full h-full object-cover transition-transform transform hover:scale-105 duration-300"
+                />
+              </CarouselItem>
+            </CarouselContent>
+            <CarouselPrevious className="text-white bg-gray-800 opacity-75 hover:opacity-100" />
+            <CarouselNext className="text-white bg-gray-800 opacity-75 hover:opacity-100" />
+          </Carousel>
         </div>
       </div>
 
