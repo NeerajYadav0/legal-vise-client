@@ -15,8 +15,10 @@ import {
 import { Label } from "@/components/ui/label";
 import { UserContext } from "@/context/UserContext";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -25,15 +27,12 @@ const Login = () => {
   const welcomeImage =
     "https://t3.ftcdn.net/jpg/05/75/22/58/360_F_575225818_PQ2ZPHFw51yCcmieutB5bT843nPAPzo3.jpg";
 
-  //   const handleLogin = () => {
-  //     console.log("Logging in...", { username, password });
-  //   };
-
   const loginHandler = (username, password) => {
     if (username.length === 0 || password.length === 0) {
       toast.error("All Fieds are required");
     } else {
       login(username, password);
+      navigate("/my-profile");
     }
   };
 
