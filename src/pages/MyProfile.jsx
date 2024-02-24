@@ -1,11 +1,8 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
 import { CiEdit } from "react-icons/ci";
-
 import {
   Dialog,
   DialogContent,
@@ -19,6 +16,7 @@ import { DialogClose } from "@radix-ui/react-dialog";
 import { UserContext } from "@/context/UserContext";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import Sidebar from "@/components/core/Dashboard/Sidebar";
 
 function MyProfile() {
   const { name, setName, getDetails, response } = useContext(UserContext);
@@ -30,9 +28,11 @@ function MyProfile() {
   }, []);
 
   return (
-    <div className="text-white flex flex-col items-center mt-8">
-      <div></div>
-      <div className="w-11/12 flex-col justify-center">
+    <div className="text-white flex gap-x-9 border-b border-slate-500">
+      <div>
+        <Sidebar />
+      </div>
+      <div className="w-11/12 flex-col justify-center mt-8">
         <h1 className="text-3xl mb-8">My Profile</h1>
 
         {/* Personal Information */}
@@ -70,7 +70,7 @@ function MyProfile() {
                 <DialogHeader>
                   <DialogTitle>Edit profile</DialogTitle>
                   <DialogDescription>
-                    Make changes to your profile here. Click save when you're
+                    Make changes to your profile here. Click save when you are
                     done.
                   </DialogDescription>
                 </DialogHeader>
@@ -94,7 +94,7 @@ function MyProfile() {
                 <DialogClose asChild>
                   <Button
                     className="w-[30%] mx-auto"
-                    onClick={() => setUserName(name)}
+                    // onClick={() => setUserName(name)}
                   >
                     Save changes
                   </Button>
@@ -108,7 +108,7 @@ function MyProfile() {
           <h1>Profile Information</h1>
         </div>
         {/* Profile Information */}
-        <Card className="w-[90%] md:px-16 sm:px-3 py-4 md:flex md:justify-between">
+        <Card className="w-[90%] md:px-16 sm:px-3 py-4 md:flex md:justify-between mb-10">
           <div className="w-[100%] md:flex md:justify-between md:flex-wrap gap-y-5">
             <div className="grid grid-cols-4 items-center gap-4 w-[100%] md:w-[50%]">
               <Label

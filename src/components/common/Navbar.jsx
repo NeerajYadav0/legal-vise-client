@@ -67,9 +67,9 @@ function Navbar() {
   const closeSidebar = () => {
     setShowSidebar(false); // Close the sidebar
   };
-
+  // shadow-[0px_0px_5px_0px] shadow-slate-300
   return (
-    <div className="p-3 text-white justify-center items-center flex shadow-[0px_0px_5px_0px] shadow-slate-300">
+    <div className="p-3 text-white justify-center items-center flex  border-b border-slate-500">
       <div className="w-11/12 flex justify-between items-center">
         <div className="flex items-center gap-3">
           <GoLaw className="text-4xl font-semibold" />

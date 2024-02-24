@@ -10,7 +10,7 @@ import MyProfile from "./pages/MyProfile";
 
 function App() {
   return (
-    <div className="bg-black flex flex-col min-h-screen w-screen">
+    <div className="bg-black flex flex-col min-h-screen w-screen font-inter">
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -18,6 +18,8 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/error" element={<Error />} />
         <Route path="/my-profile" element={<MyProfile />} />
+        <Route path="/create-job" element={<MyProfile />} />
+        <Route path="/view-job" element={<MyProfile />} />
       </Routes>
       <Footer />
     </div>
