@@ -7,6 +7,7 @@ import Footer from "./components/common/Footer";
 import Navbar from "./components/common/Navbar";
 import Error from "./components/common/Error";
 import MyProfile from "./pages/MyProfile";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   return (
@@ -20,6 +21,8 @@ function App() {
         <Route path="/my-profile" element={<MyProfile />} />
         <Route path="/create-job" element={<MyProfile />} />
         <Route path="/view-job" element={<MyProfile />} />
+        <Route path="/dashboard/:selection" element={<Dashboard />} />
+        <Route path="/dashboard/:selection/:jobId" element={<Dashboard />} />
       </Routes>
       <Footer />
     </div>

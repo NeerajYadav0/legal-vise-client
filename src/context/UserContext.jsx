@@ -9,20 +9,36 @@ export default function UserContextProvider({ children }) {
   const [token, setToken] = useState("");
   const [name, setName] = useState("");
   const [response, setResponse] = useState({});
-  const { LOGIN_API, PROFILE_DETAILS } = endpoints;
+  const { LOGIN_API, PROFILE_DETAILS, SPLOGIN_API, SPPROFILE_DETAILS } =
+    endpoints;
 
-  async function login(email, password) {
+  async function login(email, password, type) {
     const toastId = toast.loading("Loading...");
+    console.log("====================================");
+    console.log(type);
+    console.log("====================================");
     try {
       setLoading(true);
-      const response = await apiConnector("POST", LOGIN_API, {
-        email,
-        password,
-      });
+      localStorage.setItem("type", type);
+      let response = {};
+      if (type == "client") {
+        response = await apiConnector("POST", LOGIN_API, {
+          email,
+          password,
+        });
+      } else {
+        response = await apiConnector("POST", SPLOGIN_API, {
+          email,
+          password,
+        });
+      }
+
       setLoading(false);
       setName(response.data.user.name);
       setToken(response.data.token);
       localStorage.setItem("email", response?.data?.user?.email);
+      localStorage.setItem("type", type);
+
       toast.success("User logged in succesfully");
     } catch (error) {
       console.log(error);
@@ -31,13 +47,23 @@ export default function UserContextProvider({ children }) {
     toast.dismiss(toastId);
   }
 
-  async function getDetails(email) {
+  async function getDetails(email, type) {
+    console.log("====================================");
+    console.log(type);
+    console.log("====================================");
     const toastId = toast.loading("Loading...");
     try {
       setLoading(true);
-      const details = await apiConnector("POST", PROFILE_DETAILS, {
-        email,
-      });
+      let details = {};
+      if (type == "client") {
+        details = await apiConnector("POST", PROFILE_DETAILS, {
+          email,
+        });
+      } else {
+        details = await apiConnector("POST", SPPROFILE_DETAILS, {
+          email,
+        });
+      }
       setResponse(details);
       toast.success("User Data fetched successfully");
     } catch (error) {
