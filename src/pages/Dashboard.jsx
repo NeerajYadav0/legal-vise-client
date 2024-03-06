@@ -5,6 +5,10 @@ import { useParams } from "react-router-dom";
 import Error from "../components/common/Error";
 import ViewAllJobs from "./ViewAllJobs";
 import ViewJob from "./ViewJob";
+import AppliedJobs from "./AppliedJobs";
+import ClientProfile from "./ClientProfile";
+import Wishlist from "./Wishlist";
+import ClientProfilePage from "./ClientProfilePage";
 function Dashboard() {
   const { selection } = useParams("selection");
   const getComp = () => {
@@ -23,6 +27,14 @@ function Dashboard() {
         return <ViewAllJobs />;
       case "viewJob":
         return <ViewJob />;
+      case "client-profile":
+        return <ClientProfile />;
+      case "applied-job":
+        return <AppliedJobs />;
+      case "wishlist":
+        return <Wishlist />;
+      case "client-profile-page":
+        return <ClientProfilePage />;
 
       default:
         <Error />;

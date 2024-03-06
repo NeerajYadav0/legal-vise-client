@@ -22,7 +22,7 @@ function App() {
         <Route path="/create-job" element={<MyProfile />} />
         <Route path="/view-job" element={<MyProfile />} />
         <Route path="/dashboard/:selection" element={<Dashboard />} />
-        <Route path="/dashboard/:selection/:jobId" element={<Dashboard />} />
+        <Route path="/dashboard/:selection/:id" element={<Dashboard />} />
       </Routes>
       <Footer />
     </div>

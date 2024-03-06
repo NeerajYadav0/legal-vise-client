@@ -9,8 +9,16 @@ export default function UserContextProvider({ children }) {
   const [token, setToken] = useState("");
   const [name, setName] = useState("");
   const [response, setResponse] = useState({});
-  const { LOGIN_API, PROFILE_DETAILS, SPLOGIN_API, SPPROFILE_DETAILS } =
-    endpoints;
+  const {
+    LOGIN_API,
+    PROFILE_DETAILS,
+    SPLOGIN_API,
+    SPPROFILE_DETAILS,
+    GETCLIENTDETAILS,
+    REMOVEWISHLIST,
+    ADDWISHLIST,
+    GETSIMILARCLIENTS,
+  } = endpoints;
 
   async function login(email, password, type) {
     const toastId = toast.loading("Loading...");
@@ -22,14 +30,18 @@ export default function UserContextProvider({ children }) {
       localStorage.setItem("type", type);
       let response = {};
       if (type == "client") {
-        response = await apiConnector("POST", LOGIN_API, {
+        await apiConnector("POST", LOGIN_API, {
           email,
           password,
+        }).then((res) => {
+          response = res;
         });
       } else {
-        response = await apiConnector("POST", SPLOGIN_API, {
+        await apiConnector("POST", SPLOGIN_API, {
           email,
           password,
+        }).then((res) => {
+          response = res;
         });
       }
 
@@ -38,8 +50,11 @@ export default function UserContextProvider({ children }) {
       setToken(response.data.token);
       localStorage.setItem("email", response?.data?.user?.email);
       localStorage.setItem("type", type);
+      localStorage.setItem("UserID", response?.data?.user?._id);
 
       toast.success("User logged in succesfully");
+      toast.dismiss(toastId);
+      return response;
     } catch (error) {
       console.log(error);
       toast.error("User log in unsuccesfull");
@@ -71,6 +86,63 @@ export default function UserContextProvider({ children }) {
     }
     toast.dismiss(toastId);
   }
+  async function getDetailsById(id, type) {
+    console.log("====================================");
+    console.log(type);
+    console.log("====================================");
+    const toastId = toast.loading("Loading...");
+    try {
+      setLoading(true);
+      let details = {};
+      if (type == "client") {
+        details = await apiConnector(
+          "GET",
+          `${GETCLIENTDETAILS}/${id}`,
+          "",
+          ""
+        );
+      } else {
+        details = await apiConnector("POST", SPPROFILE_DETAILS, "", "");
+      }
+      setResponse(details);
+      toast.success("User Data fetched successfully");
+    } catch (error) {
+      console.log(error);
+    }
+    toast.dismiss(toastId);
+  }
+  const handelWishlist = async (setWishlist, jobId, userID, wishlist) => {
+    try {
+      if (wishlist) {
+        await apiConnector("DELETE", REMOVEWISHLIST, {
+          serviceProviderId: userID,
+          id: jobId,
+        });
+        setWishlist(!wishlist);
+      } else {
+        await apiConnector("POST", ADDWISHLIST, {
+          serviceProviderId: userID,
+          jobId,
+        });
+        setWishlist(!wishlist);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getSimilarClients = async (name) => {
+    try {
+      await apiConnector("POST", GETSIMILARCLIENTS, {
+        name,
+      }).then((res) => {
+        console.log(res);
+        setResponse(res.data.users);
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const value = {
     loading,
@@ -81,6 +153,9 @@ export default function UserContextProvider({ children }) {
     setName,
     getDetails,
     response,
+    getDetailsById,
+    handelWishlist,
+    getSimilarClients,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

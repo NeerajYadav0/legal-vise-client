@@ -1,21 +1,10 @@
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useEffect } from "react";
 import { apiConnector } from "@/services/apiConnector";
 import { endpoints } from "@/services/apis";
-import { Navigate, useNavigate } from "react-router-dom";
-import { UserContext } from "@/context/UserContext";
 import JobCard from "@/components/common/JobCard";
 
-function ViewAllJobs() {
+function AppliedJobs() {
   //   const jobs = [
   //     {
   //       _id: "65c8bc08841b8681b472e8f3",
@@ -97,31 +86,28 @@ function ViewAllJobs() {
   //     },
   //   ];
   const [jobs, setJobs] = useState([]);
-  // const [wishlist, setWishlist] = useState([]);
-  // const { getDetailsById, response } = useContext(UserContext);
+  const userID = localStorage.getItem("UserID");
   useEffect(() => {
     getJobs();
   }, []);
 
-  // useEffect(()=>{
-  //   getDetailsById(localStorage.getItem("UserID"),"serviceProvider").then(()=>{
-  //     setWishlist(response.)
-  //   });
-  // },[wishlist])
-
   const getJobs = async () => {
-    await apiConnector("get", endpoints.GETALLJOBS, "", "", "").then(
-      (response) => {
-        console.log(response);
-        setJobs(response.data);
-      }
-    );
+    await apiConnector(
+      "get",
+      `${endpoints.GETALLAPPLIEDJOBS}/${userID}`,
+      "",
+      "",
+      ""
+    ).then((response) => {
+      console.log(response);
+      setJobs(response.data);
+    });
   };
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   return (
     <div className="w-11/12 flex-col justify-center mt-8">
-      <h1 className="text-3xl mb-8">All Jobs</h1>
+      <h1 className="text-3xl mb-8">Applied Jobs</h1>
       <div className=" grid gap-y-10  grid-cols-1 md:grid-cols-2 lg:grid-cols-3 ">
         {jobs.map((job, index) => {
           const creationDate = new Date(job.createdOn);
@@ -145,4 +131,4 @@ function ViewAllJobs() {
   );
 }
 
-export default ViewAllJobs;
+export default AppliedJobs;

@@ -7,4 +7,13 @@ export const endpoints = {
   SPLOGIN_API: BASE_URL + "serviceProvider/login",
   SPPROFILE_DETAILS: BASE_URL + "serviceProvider/getDetails",
   GETALLJOBS: BASE_URL + "jobs/getall",
+  APPLYJOB: BASE_URL + "jobs/interested",
+  GETONEJOB: BASE_URL + "jobs/getOne",
+  CHECKINTERESTED: BASE_URL + "jobs/checkInterested",
+  GETALLAPPLIEDJOBS: BASE_URL + "serviceProvider/getAllServiceProviderJobs",
+  GETCLIENTDETAILS: BASE_URL + "customer/getDetails",
+  ADDWISHLIST: BASE_URL + "serviceProvider/addToWishlist",
+  REMOVEWISHLIST: BASE_URL + "serviceProvider/removeFromWishlist",
+  GETWISHLIST: BASE_URL + "serviceProvider/getWishlistJobs",
+  GETSIMILARCLIENTS: BASE_URL + "customer/getSimilarUsers",
 };
