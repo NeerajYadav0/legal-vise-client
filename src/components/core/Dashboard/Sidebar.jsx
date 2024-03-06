@@ -1,16 +1,17 @@
 import { VscAdd, VscSignOut } from "react-icons/vsc";
 import { LuView } from "react-icons/lu";
-import { CiBookmark } from "react-icons/ci";
+import { CiBookmark, CiSearch } from "react-icons/ci";
 import { CgProfile } from "react-icons/cg";
 import { useLocation, useNavigate } from "react-router-dom";
 
+// eslint-disable-next-line react/prop-types
 function Sidebar({ type }) {
   const location = useLocation();
   const navigate = useNavigate();
   console.log(location);
 
   return (
-    <div className="flex h-full w-fit flex-col bg-black border-r border-slate-500">
+    <div className="flex h-full w-[240px] flex-col bg-black border-r border-slate-500">
       <div className=" h-full shadow-right shadow-slate-300">
         <div className="flex flex-col text-slate-400 gap-y-2 mt-16">
           <div
@@ -40,7 +41,7 @@ function Sidebar({ type }) {
                     ? "bg-slate-600 text-white"
                     : ""
                 }`}
-                onClick={() => navigate("create-job")}
+                onClick={() => navigate("/dashboard/create-job")}
               >
                 <span
                   className={`absolute left-0 top-0 h-full w-[0.15rem] bg-yellow-50 ${
@@ -74,20 +75,20 @@ function Sidebar({ type }) {
 
               <div
                 className={`relative p-2 flex items-center gap-x-2 cursor-pointer ${
-                  location.pathname.includes("/view-job")
+                  location.pathname.includes("/search-legalist")
                     ? "bg-slate-600 text-white"
                     : ""
                 }`}
-                onClick={() => navigate("/view-job")}
+                onClick={() => navigate("/dashboard/search-legalist")}
               >
                 <span
                   className={`absolute left-0 top-0 h-full w-[0.15rem] bg-yellow-50 ${
-                    location.pathname.includes("/view-job")
+                    location.pathname.includes("/search-legalist")
                       ? "opacity-100"
                       : "opacity-0"
                   }`}
                 ></span>
-                <LuView className="text-xl ml-7" />
+                <CiSearch className="text-xl ml-7" />
                 <h1>Search Legalist Profile</h1>
               </div>
             </>
@@ -151,7 +152,7 @@ function Sidebar({ type }) {
             </>
           )}
 
-          <div className="h-[1px] w-[180px] flex justify-center bg-white my-4"></div>
+          <div className="h-[1px] w-[180px] flex justify-center mx-auto bg-white my-4"></div>
 
           <div
             className={`relative p-2 flex items-center gap-x-2 cursor-pointer ${

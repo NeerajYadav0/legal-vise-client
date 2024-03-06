@@ -1,28 +1,23 @@
 import Sidebar from "@/components/core/Dashboard/Sidebar";
-import { useEffect, useState } from "react";
-import MyProfile from "./MyProfile";
+import MyProfile from "../components/core/Dashboard/MyProfile";
 import { useParams } from "react-router-dom";
 import Error from "../components/common/Error";
-import ViewAllJobs from "./ViewAllJobs";
-import ViewJob from "./ViewJob";
+import ViewAllJobs from "../components/core/Dashboard/ViewAllJobs";
+import ViewJob from "../components/core/Dashboard/ViewJob";
+import CreateJob from "@/components/core/Dashboard/CreateJob";
 function Dashboard() {
   const { selection } = useParams("selection");
   const getComp = () => {
-    // if (selection == "my-profile") {
-    //   return <MyProfile />;
-    // }
-    // else if
-    // else {
-    //   return <Error />;
-    // }
     console.log(selection);
     switch (selection) {
       case "my-profile":
         return <MyProfile />;
       case "view-all-jobs":
         return <ViewAllJobs />;
-      case "viewJob":
-        return <ViewJob />;
+      case "view-job":
+        return <ViewAllJobs />;
+      case "create-job":
+        return <CreateJob />;
 
       default:
         <Error />;

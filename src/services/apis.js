@@ -7,4 +7,6 @@ export const endpoints = {
   SPLOGIN_API: BASE_URL + "serviceProvider/login",
   SPPROFILE_DETAILS: BASE_URL + "serviceProvider/getDetails",
   GETALLJOBS: BASE_URL + "jobs/getall",
+  CREATE_JOB: BASE_URL + "jobs/create",
+  CUSTOMER_JOBS: BASE_URL + "jobs/find/",
 };

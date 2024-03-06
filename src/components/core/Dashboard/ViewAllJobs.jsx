@@ -100,8 +100,10 @@ function ViewAllJobs() {
     getJobs();
   }, []);
 
+  const id = localStorage.getItem("id")
+
   const getJobs = async () => {
-    await apiConnector("get", endpoints.GETALLJOBS, "", "", "").then(
+    await apiConnector("get", `${endpoints.CUSTOMER_JOBS + id}`, "", "", "").then(
       (response) => {
         console.log(response);
         setJobs(response.data);
