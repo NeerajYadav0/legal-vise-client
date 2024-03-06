@@ -119,11 +119,11 @@ function Sidebar({ type }) {
                     ? "bg-slate-600 text-white"
                     : ""
                 }`}
-                onClick={() => navigate("/view-job")}
+                onClick={() => navigate("/dashboard/applied-job")}
               >
                 <span
                   className={`absolute left-0 top-0 h-full w-[0.15rem] bg-yellow-50 ${
-                    location.pathname.includes("/view-job")
+                    location.pathname.includes("/dashboard/applied-job")
                       ? "opacity-100"
                       : "opacity-0"
                   }`}
@@ -137,7 +137,7 @@ function Sidebar({ type }) {
                     ? "bg-slate-600 text-white"
                     : ""
                 }`}
-                onClick={() => navigate("/view-job")}
+                onClick={() => navigate("/dashboard/client-profile-page")}
               >
                 <span
                   className={`absolute left-0 top-0 h-full w-[0.15rem] bg-yellow-50 ${
@@ -160,7 +160,7 @@ function Sidebar({ type }) {
                 ? "bg-slate-600 text-white"
                 : ""
             }`}
-            onClick={() => navigate("/wishlist")}
+            onClick={() => navigate("/dashboard/wishlist")}
           >
             <span
               className={`absolute left-0 top-0 h-full w-[0.15rem] bg-yellow-50 ${

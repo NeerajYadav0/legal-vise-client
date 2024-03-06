@@ -28,12 +28,16 @@ const Login = () => {
   const welcomeImage =
     "https://t3.ftcdn.net/jpg/05/75/22/58/360_F_575225818_PQ2ZPHFw51yCcmieutB5bT843nPAPzo3.jpg";
 
-  const loginHandler = (username, password) => {
+  const loginHandler = async (username, password) => {
     if (username.length === 0 || password.length === 0) {
       toast.error("All Fieds are required");
     } else {
-      login(username, password, type);
-      navigate("/dashboard/my-profile");
+      const res = await login(username, password, type);
+      if (res.data.success) {
+        navigate("/dashboard/my-profile");
+      } else {
+        toast.error("Wrong Cridentials");
+      }
     }
   };
   useEffect(() => {
