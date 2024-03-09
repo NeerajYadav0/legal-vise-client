@@ -1,21 +1,25 @@
 import ProfileCard from "@/components/common/ProfileCard";
 import { UserContext } from "@/context/UserContext";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 
 function ClientProfilePage() {
-  const { getSimilarClients, response, setResponse } = useContext(UserContext);
-  const searchClients = (name) => {
-    getSimilarClients(name);
-    console.log(response);
+  const { getSimilarUsers } = useContext(UserContext);
+  const type = localStorage.getItem("type");
+  const [res, setRes] = useState([]);
+  const searchClients = async (name) => {
+    setRes(await getSimilarUsers(name, type));
+    console.log(res);
   };
 
   useEffect(() => {
-    getSimilarClients("");
+    getSimilarUsers("");
   });
 
   return (
     <div className="w-11/12 flex-col justify-center mt-8">
-      <h1 className="text-3xl mb-16">Search Client Profile</h1>
+      <h1 className="text-3xl mb-16">
+        Search {type == "client" ? "Legalist Profile" : "Client Profile"}
+      </h1>
       <div className="  flex flex-col gap-5">
         <div className="relative w-[80%] mx-auto">
           <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -36,7 +40,11 @@ function ClientProfilePage() {
             type="search"
             id="default-search"
             className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="Search Client Names... "
+            placeholder={
+              type == "client"
+                ? "Search Legalist Names..."
+                : "Search Client Names..."
+            }
             required
             onChange={(data) => {
               console.log(data.target.value);
@@ -45,8 +53,8 @@ function ClientProfilePage() {
           />
         </div>
         <div className="w-[80%] mx-auto flex flex-wrap justify-between">
-          {response?.map((user, index) => {
-            return <ProfileCard key={index} user={user} />;
+          {res?.map((user, index) => {
+            return <ProfileCard key={index} user={user} type={type} />;
           })}
           {/* <ProfileCard />
           <ProfileCard />

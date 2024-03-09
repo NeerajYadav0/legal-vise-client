@@ -18,4 +18,10 @@ export const endpoints = {
   REMOVEWISHLIST: BASE_URL + "serviceProvider/removeFromWishlist",
   GETWISHLIST: BASE_URL + "serviceProvider/getWishlistJobs",
   GETSIMILARCLIENTS: BASE_URL + "customer/getSimilarUsers",
+  GETSIMILARSP: BASE_URL + "serviceProvider/getSimilarServiceProviders",
+  GETSPDETAILSBYID: BASE_URL + "serviceProvider/getDetails/",
+  GET_INTERESTED_DETAILS: BASE_URL + "customer/getInterestedDetails",
+  ADD_UNLOCKED: BASE_URL + "customer/add_unlocked",
+  CREATE_RAZORPAY_ORDER: BASE_URL + "razorpay/create_order",
+  GET_UNLOCKED_USERS: BASE_URL + "customer/get_unlocked/",
 };

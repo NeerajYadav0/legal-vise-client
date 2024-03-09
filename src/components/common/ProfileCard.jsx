@@ -10,7 +10,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-function ProfileCard({ user }) {
+function ProfileCard({ user, type }) {
   const navigate = useNavigate();
   //   const user = {
   //     _id: "65e6d961858c1487549a4f0f",
@@ -79,7 +79,7 @@ function ProfileCard({ user }) {
         <CardFooter className="flex justify-between">
           <Button
             onClick={() => {
-              navigate(`/dashboard/client-profile/${user._id}`);
+              navigate(`/dashboard/user-profile/${user._id}`);
             }}
           >
             View Profile

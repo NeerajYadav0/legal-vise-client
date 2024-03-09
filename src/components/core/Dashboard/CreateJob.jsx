@@ -62,7 +62,7 @@ const CreateJob = () => {
   const handleOnSubmit = async (e) => {
     console.log(formData);
     e.preventDefault();
-    const id = localStorage.getItem("id");
+    const id = localStorage.getItem("UserID");
     console.log(id);
 
     try {

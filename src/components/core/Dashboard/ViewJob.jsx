@@ -35,17 +35,47 @@ import toast from "react-hot-toast";
 import { apiConnector } from "@/services/apiConnector";
 import { UserContext } from "@/context/UserContext";
 
+import Table from "@/components/common/CollapsibleTable";
+import EnhancedTable from "@/components/common/EnhancedTable";
+
 function ViewJob() {
+  // test code
+  const { getInterestedDetails, getUnlockedUsers } = useContext(UserContext);
+  var [rows, setRows] = useState([]);
+  var [unlocked, setUnlocked] = useState([]);
+
+  // test code ends
+
   const [job, setJob] = useState({});
   const [alreadyApplied, setAlreadyApplied] = useState(false);
   const [wishlist, setWishlist] = useState(false);
+  const [showTable, setShowTable] = useState(false);
   useEffect(() => {
+    getUnlocked();
     getJob();
+    console.log(type);
   }, []);
+
+  useEffect(() => {
+    getDetails();
+    // console.log(unlocked);
+  }, [job, unlocked]);
+
+  const getDetails = async () => {
+    await getInterestedDetails(job?.interested, unlocked).then((res) => {
+      setRows(res.data);
+    });
+  };
+  const getUnlocked = async () => {
+    await getUnlockedUsers().then((res) => {
+      setUnlocked(res);
+    });
+  };
+
   const { id } = useParams("id");
   const jobId = id;
   const { APPLYJOB, GETONEJOB, CHECKINTERESTED } = endpoints;
-  const { handelWishlist } = useContext(UserContext);
+  const { handelWishlist, type } = useContext(UserContext);
 
   const navigate = useNavigate();
   const [selectedPrice, setSelectedPrice] = useState();
@@ -171,23 +201,53 @@ function ViewJob() {
             </div>
           </CardContent>
           <CardFooter className="flex justify-between">
-            <Button
-              variant="outline"
-              onClick={() => {
-                handelWishlist(setWishlist, jobId, userID, wishlist);
-              }}
-            >
-              {wishlist ? "Remove from Wishlist" : "Add to Wishlist"}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => {
-                navigate(`/dashboard/client-profile/${job.customerId}`);
-              }}
-            >
-              View Customer Profile
-            </Button>
-            {/* <Button
+            {type == "client" ? (
+              <div className=" w-full">
+                <div className="flex justify-center">
+                  {" "}
+                  <Button
+                    className="mx-auto mb-4"
+                    variant="outline"
+                    onClick={() => {
+                      setShowTable(!showTable);
+                    }}
+                  >
+                    {showTable ? "Hide" : "View"} Applications
+                  </Button>
+                </div>
+
+                {showTable ? (
+                  <>
+                    {/* <Table /> */}
+                    <EnhancedTable
+                      interested={job?.interested}
+                      rows={rows}
+                      getUnlocked={getUnlocked}
+                    />
+                  </>
+                ) : (
+                  <></>
+                )}
+              </div>
+            ) : (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    handelWishlist(setWishlist, jobId, userID, wishlist);
+                  }}
+                >
+                  {wishlist ? "Remove from Wishlist" : "Add to Wishlist"}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    navigate(`/dashboard/client-profile/${job.customerId}`);
+                  }}
+                >
+                  View Customer Profile
+                </Button>
+                {/* <Button
               variant="outline"
               onClick={() => {
                 navigate(`/dashboard/viewJob/${job._id}`);
@@ -195,126 +255,130 @@ function ViewJob() {
             >
               Apply
             </Button> */}
-            {/* drawer start */}
-            <Drawer>
-              <DrawerTrigger disabled={alreadyApplied || !job?.isActive}>
-                <Button variant="outline">
-                  {" "}
-                  {alreadyApplied
-                    ? "Already Applied"
-                    : job?.isActive
-                    ? "Apply"
-                    : "Job Inactive"}
-                </Button>
-              </DrawerTrigger>
-              <DrawerContent>
-                <DrawerHeader>
-                  <DrawerTitle>Apply for job?</DrawerTitle>
-                  <DrawerDescription>
-                    This action cannot be undone.
-                  </DrawerDescription>
-                </DrawerHeader>
-                <div className="flex flex-col md:flex-row justify-evenly w-full min-h-[100px] ">
-                  <div className="flex flex-col  items-center">
-                    <h1 className="pb-5 md:p-0">Approx Amount</h1>
-                    <div className="pb-5 md:p-0">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="outline">
-                            {selectedPrice || "Select"}
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56">
-                          <DropdownMenuLabel>Approx Amount</DropdownMenuLabel>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuGroup>
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setSelectedPrice("Rs 0 - Rs 1000");
-                              }}
-                              className="cursor-pointer"
-                            >
-                              Rs 0 - Rs 1000
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setSelectedPrice("Rs 1001 - Rs 5000");
-                              }}
-                              className="cursor-pointer"
-                            >
-                              Rs 1001 - Rs 5000
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setSelectedPrice("Rs 5001 - Rs 10,000");
-                              }}
-                              className="cursor-pointer"
-                            >
-                              Rs 5001 - Rs 10,000
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setSelectedPrice("Rs 10,001 - Rs 20,000");
-                              }}
-                              className="cursor-pointer"
-                            >
-                              Rs 10,001 - Rs 20,000
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setSelectedPrice("Rs 20,001 - Rs 50,000");
-                              }}
-                              className="cursor-pointer"
-                            >
-                              Rs 20,001 - Rs 50,000
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setSelectedPrice("Rs 50,001 - Rs 1,00,000");
-                              }}
-                              className="cursor-pointer"
-                            >
-                              Rs 50,001 - Rs 1,00,000
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setSelectedPrice("Rs 1,00,000 - Above");
-                              }}
-                              className="cursor-pointer"
-                            >
-                              Rs 1,00,000 - Above
-                            </DropdownMenuItem>
-                          </DropdownMenuGroup>
-                          <DropdownMenuSeparator />
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                {/* drawer start */}
+                <Drawer>
+                  <DrawerTrigger disabled={alreadyApplied || !job?.isActive}>
+                    <Button variant="outline">
+                      {" "}
+                      {alreadyApplied
+                        ? "Already Applied"
+                        : job?.isActive
+                        ? "Apply"
+                        : "Job Inactive"}
+                    </Button>
+                  </DrawerTrigger>
+                  <DrawerContent>
+                    <DrawerHeader>
+                      <DrawerTitle>Apply for job?</DrawerTitle>
+                      <DrawerDescription>
+                        This action cannot be undone.
+                      </DrawerDescription>
+                    </DrawerHeader>
+                    <div className="flex flex-col md:flex-row justify-evenly w-full min-h-[100px] ">
+                      <div className="flex flex-col  items-center">
+                        <h1 className="pb-5 md:p-0">Approx Amount</h1>
+                        <div className="pb-5 md:p-0">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="outline">
+                                {selectedPrice || "Select"}
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-56">
+                              <DropdownMenuLabel>
+                                Approx Amount
+                              </DropdownMenuLabel>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuGroup>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setSelectedPrice("Rs 0 - Rs 1000");
+                                  }}
+                                  className="cursor-pointer"
+                                >
+                                  Rs 0 - Rs 1000
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setSelectedPrice("Rs 1001 - Rs 5000");
+                                  }}
+                                  className="cursor-pointer"
+                                >
+                                  Rs 1001 - Rs 5000
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setSelectedPrice("Rs 5001 - Rs 10,000");
+                                  }}
+                                  className="cursor-pointer"
+                                >
+                                  Rs 5001 - Rs 10,000
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setSelectedPrice("Rs 10,001 - Rs 20,000");
+                                  }}
+                                  className="cursor-pointer"
+                                >
+                                  Rs 10,001 - Rs 20,000
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setSelectedPrice("Rs 20,001 - Rs 50,000");
+                                  }}
+                                  className="cursor-pointer"
+                                >
+                                  Rs 20,001 - Rs 50,000
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setSelectedPrice("Rs 50,001 - Rs 1,00,000");
+                                  }}
+                                  className="cursor-pointer"
+                                >
+                                  Rs 50,001 - Rs 1,00,000
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setSelectedPrice("Rs 1,00,000 - Above");
+                                  }}
+                                  className="cursor-pointer"
+                                >
+                                  Rs 1,00,000 - Above
+                                </DropdownMenuItem>
+                              </DropdownMenuGroup>
+                              <DropdownMenuSeparator />
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </div>
+                      <div className="flex flex-col  items-center">
+                        <h1 className="pb-5 md:p-0">Comments</h1>
+                        <Textarea
+                          className="pb-5 md:p-0 border"
+                          id="approx-amount"
+                          type="text"
+                          value={comments}
+                          onChange={(e) => setComments(e.target.value)}
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex flex-col  items-center">
-                    <h1 className="pb-5 md:p-0">Comments</h1>
-                    <Textarea
-                      className="pb-5 md:p-0 border"
-                      id="approx-amount"
-                      type="text"
-                      value={comments}
-                      onChange={(e) => setComments(e.target.value)}
-                    />
-                  </div>
-                </div>
-                <DrawerFooter>
-                  <DrawerClose>
-                    <Button className="w-full" onClick={applyJob}>
-                      Submit
-                    </Button>
-                    <Button className="w-full" variant="outline">
-                      Cancel
-                    </Button>
-                  </DrawerClose>
-                </DrawerFooter>
-              </DrawerContent>
-            </Drawer>
+                    <DrawerFooter>
+                      <DrawerClose>
+                        <Button className="w-full" onClick={applyJob}>
+                          Submit
+                        </Button>
+                        <Button className="w-full" variant="outline">
+                          Cancel
+                        </Button>
+                      </DrawerClose>
+                    </DrawerFooter>
+                  </DrawerContent>
+                </Drawer>
 
-            {/* drawer end */}
+                {/* drawer end */}
+              </>
+            )}
           </CardFooter>
         </Card>
         <div className=" relative w-[30%] h-[300px] flex hover:scale-110 duration-500">

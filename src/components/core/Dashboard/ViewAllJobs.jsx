@@ -103,17 +103,23 @@ function ViewAllJobs() {
     getJobs();
   }, []);
 
-  const id = localStorage.getItem("id");
+  // const id = localStorage.getItem("id");
   // useEffect(()=>{
   //   getDetailsById(localStorage.getItem("UserID"),"serviceProvider").then(()=>{
   //     setWishlist(response.)
   //   });
   // },[wishlist])
-
+  // const {GETALLJOBS,} = endpoints;
   const getJobs = async () => {
+    const type = localStorage.getItem("type");
+    const userId = localStorage.getItem("UserID");
     await apiConnector(
       "get",
-      `${endpoints.CUSTOMER_JOBS + id}`,
+      `${
+        type == "client"
+          ? `${endpoints.CUSTOMER_JOBS + userId}`
+          : endpoints.GETALLJOBS
+      }`,
       "",
       "",
       ""
@@ -122,7 +128,7 @@ function ViewAllJobs() {
       setJobs(response.data);
     });
   };
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   return (
     <div className="w-11/12 flex-col justify-center mt-8">

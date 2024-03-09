@@ -42,17 +42,27 @@ function ClientProfile() {
   // my profile code paste
 
   const { name, setName, response, getDetailsById } = useContext(UserContext);
-
+  const type = localStorage.getItem("type");
   useEffect(() => {
-    console.log("in Client profile ");
-    getDetailsById(id, "client");
-    console.log(response);
+    if (type == "client") {
+      console.log("in Legalist search profile ");
+      getDetailsById(id, "serviceProvider");
+      console.log(response);
+    } else {
+      console.log("in Client search  profile ");
+      getDetailsById(id, "client");
+      console.log(response);
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <div className="w-11/12 flex-col justify-center mt-8">
-      <h1 className="text-3xl mb-8">Client Profile</h1>
+      <h1 className="text-3xl mb-8">
+        {" "}
+        {type == "client" ? "Legalist Profile" : "Client Profile"}
+      </h1>
 
       {/* Personal Information */}
       <Card className="w-[90%] md:p-16 p-5 md:flex md:justify-between ">

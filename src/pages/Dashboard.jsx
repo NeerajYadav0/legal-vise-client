@@ -26,13 +26,15 @@ function Dashboard() {
         return <CreateJob />;
       case "viewJob":
         return <ViewJob />;
-      case "client-profile":
+      case "user-profile":
         return <ClientProfile />;
       case "applied-job":
         return <AppliedJobs />;
       case "wishlist":
         return <Wishlist />;
       case "client-profile-page":
+        return <ClientProfilePage />;
+      case "search-legalist":
         return <ClientProfilePage />;
 
       default:

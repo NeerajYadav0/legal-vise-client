@@ -73,7 +73,7 @@ function Navbar() {
       <div className="w-11/12 flex justify-between items-center">
         <div className="flex items-center gap-3">
           <GoLaw className="text-4xl font-semibold" />
-          <span className="text-2xl font-serif font-semibold">Legal vise</span>
+          <span className="text-2xl font-serif font-semibold">Legal wise</span>
         </div>
         <div className="hidden md:flex justify-evenly items-center w-[80%] text-md font-semibold ">
           {NavbarLinks.map((link, index) => (
@@ -139,6 +139,7 @@ function Navbar() {
                   {link.title}
                 </Link>
               ))}
+              {/* <div id="google_translate_element"></div> */}
               <Button
                 className="bg-white text-black hover:scale-95 duration-200 hover:text-white"
                 onClick={() => navigate("/login")}
