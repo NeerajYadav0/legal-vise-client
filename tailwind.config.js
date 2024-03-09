@@ -9,6 +9,11 @@ module.exports = {
   ],
   prefix: "",
   theme: {
+    fontFamily: {
+      inter: ["Inter", "sans-serif"],
+      "edu-sa": ["Edu SA Beginner", "cursive"],
+      mono: ["Roboto Mono", "monospace"],
+    },
     container: {
       center: true,
       padding: "2rem",

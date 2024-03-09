@@ -6,19 +6,21 @@ import Signup from "./pages/Signup";
 import Footer from "./components/common/Footer";
 import Navbar from "./components/common/Navbar";
 import Error from "./components/common/Error";
-// import Footer from "./components/ui/common/Footer";
-import MyProfile from "./pages/MyProfile";
+import MyProfile from "./components/core/Dashboard/MyProfile";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   return (
-    <div className="bg-black flex flex-col min-h-screen w-screen">
+    <div className="bg-black flex flex-col min-h-screen w-screen font-inter">
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/error" element={<Error />} />
-        <Route path="/my-profile" element={<MyProfile />} />
+        <Route path="/create-job" element={<MyProfile />} />
+        <Route path="/dashboard/:selection" element={<Dashboard />} />
+        <Route path="/dashboard/:selection/:id" element={<Dashboard />} />
       </Routes>
       <Footer />
     </div>

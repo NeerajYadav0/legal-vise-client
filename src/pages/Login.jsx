@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -21,21 +21,28 @@ const Login = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [type, setType] = useState("client");
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useContext(UserContext);
 
   const welcomeImage =
     "https://t3.ftcdn.net/jpg/05/75/22/58/360_F_575225818_PQ2ZPHFw51yCcmieutB5bT843nPAPzo3.jpg";
 
-  const loginHandler = (username, password) => {
+  const loginHandler = async (username, password) => {
     if (username.length === 0 || password.length === 0) {
       toast.error("All Fieds are required");
     } else {
-      login(username, password);
-      navigate("/my-profile");
+      const res = await login(username, password, type);
+      if (res.data.success) {
+        navigate("/dashboard/my-profile");
+      } else {
+        toast.error("Wrong Cridentials");
+      }
     }
   };
-
+  useEffect(() => {
+    console.log(type);
+  }, [type]);
   return (
     <div className="p-0">
       <div className="flex relative items-center justify-center h-screen">
@@ -53,13 +60,24 @@ const Login = () => {
             <form onSubmit={(e) => e.preventDefault()}>
               <div className="grid w-[100%] items-center gap-4 ">
                 <div className="flex flex-col space-y-1.5 ">
-                  <Tabs
-                    defaultValue="account"
-                    className=" w-[100%] text-center"
-                  >
+                  <Tabs defaultValue="client" className=" w-[100%] text-center">
                     <TabsList>
-                      <TabsTrigger value="account">Lawyer</TabsTrigger>
-                      <TabsTrigger value="password">Client</TabsTrigger>
+                      <TabsTrigger
+                        value="client"
+                        onClick={() => {
+                          setType("client");
+                        }}
+                      >
+                        Client
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="serviceProvider"
+                        onClick={() => {
+                          setType("serviceProvider");
+                        }}
+                      >
+                        Legalist
+                      </TabsTrigger>
                     </TabsList>
                   </Tabs>
                   <Label htmlFor="name">

@@ -11,11 +11,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import photo from "../assets/images/homePageImg1.jpg";
+import photo from "../../../assets/images/homePageImg1.jpg";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { UserContext } from "@/context/UserContext";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { formattedDate } from "@/utils/dateFormatter";
 
 function MyProfile() {
   const { name, setName, getDetails, response } = useContext(UserContext);
@@ -211,7 +212,7 @@ function MyProfile() {
               placeholder="Please enter your name..."
               className="col-span-3"
               readOnly
-              defaultValue={response?.data?.user?.createdAt}
+              defaultValue={formattedDate(response?.data?.user?.createdAt)}
             />
           </div>
 

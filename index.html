@@ -12,8 +12,77 @@
 
 
     <title>Vite + React</title>
+    <!-- <style>
+      /* Style for the wrapper div */
+      #google_translate_element {
+        background-color: black;
+        padding: 10px; /* Adjust padding as needed */
+        border-radius: 5px; /* Add rounded corners */
+        display: flex;
+      }
+    
+      /* Style for the input box */
+      #google_translate_element input[type="text"] {
+        background-color: #fff; /* Background color for the input */
+        border: 1px solid #ccc; /* Border style */
+        border-radius: 3px; /* Add rounded corners */
+        padding: 5px; /* Adjust padding as needed */
+        width: 200px; /* Set width */
+      }
+    
+      /* Style for the dropdown button */
+      #google_translate_element select {
+        background-color: #fff; /* Background color for the dropdown */
+        border: 1px solid #ccc; /* Border style */
+        border-radius: 3px; /* Add rounded corners */
+        padding: 5px; /* Adjust padding as needed */
+      }
+    </style> -->
+    <style>
+      /* Hide the "Powered by Google" text */
+      .VIpgJd-ZVi9od-l4eHX-hSRGPd {
+        display: none !important;
+      }
+      .goog-te-gadget ~ span ::before {
+    /* Your styles here */
+    /* For example: */
+    font-weight: bold; /* Make text bold */
+    color: red; /* Change text color */
+    /* Add any other styles you need */
+  }
+
+     
+  /* Target the parent element */
+ 
+
+
+    </style>
   </head>
   <body>
+  
+    <!-- <div id="google_translate_element" style="width: 100vw;"></div>
+
+    <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({pageLanguage: 'en',layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL}, 'google_translate_element');
+    }
+    </script>
+    
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <script>
+      function removeText() {
+        var elements = document.getElementsByClassName("goog-te-gadget");
+        console.log(elements[0]);
+    for (var i = 0; i < elements.length; i++) {
+      var currentElement = elements[i];
+      currentElement.textContent = <select class="goog-te-combo" aria-label="Language Translate Widget"><option value="fi">Finnish</option>slot</select>; // Clear text content
+    }
+
+
+      }
+    </script>
+    <button onclick="removeText()">Remove Text</button> -->
+
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
