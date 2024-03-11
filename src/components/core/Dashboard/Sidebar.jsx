@@ -26,7 +26,7 @@ function Sidebar({ type }) {
     <div>
       <div className="lg:hidden flex mt-3 ml-3">
         <GiHamburgerMenu
-          className={`text-2xl text-white transition-colors ${
+          className={`text-2xl text-white transition-colors z-20 ${
             showSidebar ? "text-opacity-50" : "text-opacity-100"
           } cursor-pointer`}
           onClick={toggleSidebar}
@@ -207,7 +207,7 @@ function Sidebar({ type }) {
       {showSidebar ? (
         <>
           <div
-            className="shadow-right shadow-black shadow-2xl  fixed bg-black min-h-full lg:hidden min-w-[230px]"
+            className="shadow-right shadow-black shadow-2xl sticky  bg-black min-h-full lg:hidden min-w-[230px] z-10"
             onClick={closeSidebar}
           >
             <div className="flex flex-col text-slate-400 gap-y-2 mt-16">

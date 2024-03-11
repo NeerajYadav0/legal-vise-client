@@ -27,7 +27,7 @@ function Navbar() {
           <GoLaw className="text-4xl font-semibold" />
           <span className="text-2xl font-serif font-semibold">Legalvise</span>
         </div>
-        <div className="hidden md:flex justify-evenly items-center w-[80%] text-md font-semibold ">
+        <div className="hidden md:flex justify-evenly items-center w-[80%] text-md ">
           {NavbarLinks.map((link, index) => (
             <Link
               key={index}
