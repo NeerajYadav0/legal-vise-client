@@ -50,16 +50,21 @@
 
 // export default Navbar;
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+// import { useContext, useState } from "react";
 import { GoLaw } from "react-icons/go";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import { NavbarLinks } from "@/data/NavbarLinks";
+import { UserContext } from "@/context/UserContext";
+import ProfileDropdown from "./ProfileDropdown";
 
 function Navbar() {
   const navigate = useNavigate();
   const [showSidebar, setShowSidebar] = useState(false);
 
+  const { token } = useContext(UserContext);
+  console.log(token);
   const toggleSidebar = () => {
     setShowSidebar((prevState) => !prevState); // Toggle the state
   };
@@ -74,9 +79,9 @@ function Navbar() {
       <div className="w-11/12 flex justify-between items-center">
         <div className="flex items-center gap-3">
           <GoLaw className="text-4xl font-semibold" />
-          <span className="text-2xl font-serif font-semibold">Legal wise</span>
+          <span className="text-2xl font-serif font-semibold">Legalvise</span>
         </div>
-        <div className="hidden md:flex justify-evenly items-center w-[80%] text-md font-semibold ">
+        <div className="hidden md:flex justify-evenly items-center w-[80%] text-md ">
           {NavbarLinks.map((link, index) => (
             <Link
               key={index}
@@ -86,20 +91,25 @@ function Navbar() {
               {link.title}
             </Link>
           ))}
-          <div className="gap-x-5 flex">
-            <Button
-              className="bg-white text-black hover:scale-95 duration-200 hover:text-white"
-              onClick={() => navigate("/login")}
-            >
-              Login
-            </Button>
-            <Button
-              className="bg-white text-black hover:scale-95 duration-200 hover:text-white"
-              onClick={() => navigate("/signup")}
-            >
-              Sign Up
-            </Button>
-          </div>
+
+          {token === null ? (
+            <div className="gap-x-5 flex">
+              <Button
+                className="bg-white text-black hover:scale-95 duration-200 hover:text-white"
+                onClick={() => navigate("/login")}
+              >
+                Login
+              </Button>
+              <Button
+                className="bg-white text-black hover:scale-95 duration-200 hover:text-white"
+                onClick={() => navigate("/signup")}
+              >
+                Sign Up
+              </Button>
+            </div>
+          ) : (
+            <ProfileDropdown />
+          )}
         </div>
         <div className="flex items-center md:hidden">
           <button
@@ -141,6 +151,7 @@ function Navbar() {
                 </Link>
               ))}
               {/* <div id="google_translate_element"></div> */}
+
               <Button
                 className="bg-white text-black hover:scale-95 duration-200 hover:text-white"
                 onClick={() => navigate("/login")}

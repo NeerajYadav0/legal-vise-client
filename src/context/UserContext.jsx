@@ -8,7 +8,7 @@ export const UserContext = createContext();
 // eslint-disable-next-line react/prop-types
 export default function UserContextProvider({ children }) {
   const [loading, setLoading] = useState(false);
-  const [token, setToken] = useState("");
+  const [token, setToken] = useState(null);
   const [name, setName] = useState("");
   const [type, setType] = useState("");
   const [response, setResponse] = useState({});
