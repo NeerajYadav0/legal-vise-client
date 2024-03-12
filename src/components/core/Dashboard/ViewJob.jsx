@@ -40,7 +40,8 @@ import EnhancedTable from "@/components/common/EnhancedTable";
 
 function ViewJob() {
   // test code
-  const { getInterestedDetails, getUnlockedUsers } = useContext(UserContext);
+  const { getInterestedDetails, getUnlockedUsers, changeJobStatus } =
+    useContext(UserContext);
   var [rows, setRows] = useState([]);
   var [unlocked, setUnlocked] = useState([]);
 
@@ -76,6 +77,7 @@ function ViewJob() {
   const jobId = id;
   const { APPLYJOB, GETONEJOB, CHECKINTERESTED } = endpoints;
   const { handelWishlist, type } = useContext(UserContext);
+  const [status, setStatus] = useState(true);
 
   const navigate = useNavigate();
   const [selectedPrice, setSelectedPrice] = useState();
@@ -112,6 +114,7 @@ function ViewJob() {
       (res) => {
         // setJob(res.data?.job);
         setJob(res.data.job);
+        setStatus(res?.data?.job?.isActive);
       }
     );
     await apiConnector(
@@ -155,6 +158,13 @@ function ViewJob() {
       console.log(error);
       toast.error("Some error occurred");
     }
+  };
+
+  const changeStatus = () => {
+    setStatus(!status);
+    changeJobStatus(job?._id).then(() => {
+      toast.success("Job status changes");
+    });
   };
 
   return (
@@ -203,10 +213,10 @@ function ViewJob() {
           <CardFooter className="flex justify-between">
             {type == "client" ? (
               <div className=" w-full">
-                <div className="flex justify-center">
+                <div className="flex justify-between">
                   {" "}
                   <Button
-                    className="mx-auto mb-4"
+                    className=" mb-4"
                     variant="outline"
                     onClick={() => {
                       setShowTable(!showTable);
@@ -214,17 +224,26 @@ function ViewJob() {
                   >
                     {showTable ? "Hide" : "View"} Applications
                   </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      changeStatus();
+                    }}
+                    className={`${status ? "" : "bg-red-300"}`}
+                  >
+                    {status ? "Set Inactive" : "Set Active"}
+                  </Button>
                 </div>
 
                 {showTable ? (
-                  <>
+                  <div>
                     {/* <Table /> */}
                     <EnhancedTable
                       interested={job?.interested}
                       rows={rows}
                       getUnlocked={getUnlocked}
                     />
-                  </>
+                  </div>
                 ) : (
                   <></>
                 )}

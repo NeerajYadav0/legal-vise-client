@@ -12,6 +12,7 @@ export default function UserContextProvider({ children }) {
   const [name, setName] = useState("");
   const [type, setType] = useState("");
   const [response, setResponse] = useState({});
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const {
     LOGIN_API,
     PROFILE_DETAILS,
@@ -28,6 +29,11 @@ export default function UserContextProvider({ children }) {
     CREATE_RAZORPAY_ORDER,
     ADD_UNLOCKED,
     GET_UNLOCKED_USERS,
+    SP_PASSWORD_CHANGE,
+    CUSTOMER_PASSWORD_CHANGE,
+    UPDATE_SP_PROFILE,
+    UPDATE_CUSTOMER_PROFILE,
+    CHANGE_JOB_STATUS,
   } = endpoints;
 
   async function login(email, password, type) {
@@ -62,6 +68,7 @@ export default function UserContextProvider({ children }) {
       localStorage.setItem("email", response?.data?.user?.email);
       localStorage.setItem("type", type);
       localStorage.setItem("UserID", response?.data?.user?._id);
+      localStorage.setItem("token", response.data.token);
 
       toast.success("User logged in succesfully");
       toast.dismiss(toastId);
@@ -90,8 +97,10 @@ export default function UserContextProvider({ children }) {
           email,
         });
       }
-      setResponse(details);
+      // setResponse(details);
       toast.success("User Data fetched successfully");
+      toast.dismiss(toastId);
+      return details;
     } catch (error) {
       console.log(error);
     }
@@ -318,6 +327,75 @@ export default function UserContextProvider({ children }) {
       console.log(error);
     }
   }
+  const changePassword = async (currentPassword, newPassword) => {
+    try {
+      const userId = localStorage.getItem("UserID");
+      let response = {};
+      if (type == "client") {
+        await apiConnector("POST", CUSTOMER_PASSWORD_CHANGE, {
+          currentPassword: currentPassword,
+          userId: userId,
+          newPassword: newPassword,
+        }).then((res) => {
+          response = res;
+          // response = res.data.users;
+        });
+      } else {
+        await apiConnector("POST", SP_PASSWORD_CHANGE, {
+          currentPassword: currentPassword,
+          userId: userId,
+          newPassword: newPassword,
+        }).then((res) => {
+          response = res;
+          // response = res.data.users;
+        });
+      }
+      console.log(response);
+      return response;
+    } catch (error) {
+      console.log(error);
+      return error.response;
+    }
+  };
+
+  const updateProfile = async (profileData) => {
+    try {
+      const userId = localStorage.getItem("UserID");
+      let response = {};
+      if (type == "client") {
+        await apiConnector("PUT", UPDATE_CUSTOMER_PROFILE + userId, {
+          ...profileData,
+        }).then((res) => {
+          response = res;
+          // response = res.data.users;
+        });
+      } else {
+        await apiConnector("PUT", UPDATE_SP_PROFILE + userId, {
+          ...profileData,
+        }).then((res) => {
+          response = res;
+          // response = res.data.users;
+        });
+      }
+      console.log(response);
+      return response;
+    } catch (error) {
+      console.log(error);
+      return error.response;
+    }
+  };
+
+  const changeJobStatus = async (jobId) => {
+    try {
+      await apiConnector("PUT", CHANGE_JOB_STATUS + jobId, {}).then((res) => {
+        return res.data.success;
+        // response = res.data.users;
+      });
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  };
 
   const value = {
     loading,
@@ -336,6 +414,9 @@ export default function UserContextProvider({ children }) {
     type,
     handelRazorpay,
     getUnlockedUsers,
+    changePassword,
+    updateProfile,
+    changeJobStatus,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

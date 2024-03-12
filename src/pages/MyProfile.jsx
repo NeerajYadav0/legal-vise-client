@@ -241,7 +241,8 @@ function MyProfile() {
             />
           </div>
           <div className="flex justify-center gap-4 w-[100%] mt-5 md:w-[50%] md:justify-end">
-            <Button className="w-[20%]">Cancel</Button>
+            <Button className="w-[20%]">Change Password</Button>
+            <Button className="w-[20%]">Reset</Button>
             <Button className="w-[20%]">Save</Button>
           </div>
         </div>

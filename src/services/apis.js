@@ -12,6 +12,7 @@ export const endpoints = {
   APPLYJOB: BASE_URL + "jobs/interested",
   GETONEJOB: BASE_URL + "jobs/getOne",
   CHECKINTERESTED: BASE_URL + "jobs/checkInterested",
+  CHANGE_JOB_STATUS: BASE_URL + "jobs/updateJobStatus/",
   GETALLAPPLIEDJOBS: BASE_URL + "serviceProvider/getAllServiceProviderJobs",
   GETCLIENTDETAILS: BASE_URL + "customer/getDetails",
   ADDWISHLIST: BASE_URL + "serviceProvider/addToWishlist",
@@ -24,4 +25,8 @@ export const endpoints = {
   ADD_UNLOCKED: BASE_URL + "customer/add_unlocked",
   CREATE_RAZORPAY_ORDER: BASE_URL + "razorpay/create_order",
   GET_UNLOCKED_USERS: BASE_URL + "customer/get_unlocked/",
+  CUSTOMER_PASSWORD_CHANGE: BASE_URL + "customer/change_password",
+  SP_PASSWORD_CHANGE: BASE_URL + "serviceProvider/change_password",
+  UPDATE_CUSTOMER_PROFILE: BASE_URL + "customer/update/",
+  UPDATE_SP_PROFILE: BASE_URL + "serviceProvider/update/",
 };

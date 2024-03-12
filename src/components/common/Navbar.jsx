@@ -50,7 +50,7 @@
 
 // export default Navbar;
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GoLaw } from "react-icons/go";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
@@ -68,6 +68,7 @@ function Navbar() {
     setShowSidebar(false); // Close the sidebar
   };
   // shadow-[0px_0px_5px_0px] shadow-slate-300
+
   return (
     <div className="p-3 text-white justify-center items-center flex  border-b border-slate-500">
       <div className="w-11/12 flex justify-between items-center">

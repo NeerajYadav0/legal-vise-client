@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,10 +41,15 @@ function ClientProfile() {
   //   };
   // my profile code paste
 
-  const { name, setName, response, getDetailsById } = useContext(UserContext);
+  const { name, setName, response, getDetailsById, getUnlockedUsers } =
+    useContext(UserContext);
   const type = localStorage.getItem("type");
+  const [unlocked, setUnlocked] = useState([]);
   useEffect(() => {
     if (type == "client") {
+      getUnlockedUsers().then((res) => {
+        setUnlocked(res);
+      });
       console.log("in Legalist search profile ");
       getDetailsById(id, "serviceProvider");
       console.log(response);
@@ -76,7 +81,12 @@ function ClientProfile() {
           </div>
           <div className="font-bold text-lg mt-4 md:mt-0">
             <h1 className="uppercase">Name: {response?.data?.user?.name}</h1>
-            <h1>EMAIL: XXXXXXX@gmail.com</h1>
+            <h1>
+              EMAIL:{" "}
+              {unlocked.includes(response?.data?.user?._id)
+                ? response?.data?.user?.email
+                : "XXXXXXX@gmail.com"}
+            </h1>
             <h1 className="uppercase">
               Account Type: {response?.data?.user?.type}
             </h1>
@@ -170,21 +180,25 @@ function ClientProfile() {
             />
           </div>
 
-          {/* <div className="grid grid-cols-4 items-center gap-4 w-[100%] md:w-[50%]">
-            <Label
-              htmlFor="number"
-              className="text-right w-[100%] flex justify-center"
-            >
-              Contact Number
-            </Label>
-            <Input
-              id="number"
-              placeholder="Please enter your number..."
-              className="col-span-3 font-semibold"
-              readOnly
-              defaultValue={response?.data?.user?.phoneNumber}
-            />
-          </div> */}
+          {unlocked.includes(response?.data?.user?._id) ? (
+            <div className="grid grid-cols-4 items-center gap-4 w-[100%] md:w-[50%]">
+              <Label
+                htmlFor="number"
+                className="text-right w-[100%] flex justify-center"
+              >
+                Contact Number
+              </Label>
+              <Input
+                id="number"
+                placeholder="Please enter your number..."
+                className="col-span-3 font-semibold"
+                readOnly
+                defaultValue={response?.data?.user?.phoneNumber}
+              />
+            </div>
+          ) : (
+            <></>
+          )}
 
           <div className="grid grid-cols-4 items-center gap-4 w-[100%] md:w-[50%]">
             <Label

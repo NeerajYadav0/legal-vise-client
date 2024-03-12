@@ -8,6 +8,7 @@ import Navbar from "./components/common/Navbar";
 import Error from "./components/common/Error";
 import MyProfile from "./components/core/Dashboard/MyProfile";
 import Dashboard from "./pages/Dashboard";
+import Translate from "./components/common/Translate";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/dashboard/:selection" element={<Dashboard />} />
         <Route path="/dashboard/:selection/:id" element={<Dashboard />} />
       </Routes>
+      <Translate />
       <Footer />
     </div>
   );
