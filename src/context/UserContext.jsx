@@ -1,7 +1,9 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { apiConnector } from "@/services/apiConnector";
 import { endpoints } from "@/services/apis";
 import toast from "react-hot-toast";
+import { Cloudinary } from "@cloudinary/url-gen";
+import { useLocation, useNavigate } from "react-router-dom";
 // import Razorpay from "razorpay";
 export const UserContext = createContext();
 
@@ -34,7 +36,14 @@ export default function UserContextProvider({ children }) {
     UPDATE_SP_PROFILE,
     UPDATE_CUSTOMER_PROFILE,
     CHANGE_JOB_STATUS,
+    GET_FAV_LEGALIST,
+    SELECTED_IN_JOB,
   } = endpoints;
+
+  useEffect(() => {
+    setToken(localStorage.getItem("token"));
+    setName(localStorage.getItem("name") || "");
+  }, []);
 
   async function login(email, password, type) {
     const toastId = toast.loading("Loading...");
@@ -66,6 +75,7 @@ export default function UserContextProvider({ children }) {
       setName(response.data.user.name);
       setToken(response.data.token);
       localStorage.setItem("email", response?.data?.user?.email);
+      localStorage.setItem("name", response?.data?.user?.name);
       localStorage.setItem("type", type);
       localStorage.setItem("UserID", response?.data?.user?._id);
       localStorage.setItem("token", response.data.token);
@@ -178,18 +188,24 @@ export default function UserContextProvider({ children }) {
     const toastId = toast.loading("Loading...");
     try {
       setLoading(true);
-      await apiConnector("POST", CREATE_JOB, {
-        customerId: customerId,
-        jobName: data.jobName,
-        jobDesc: data.jobDesc,
-        category: data.category,
-        isActive: data.isActive === "Active" ? true : false,
-        jobPincode: data.jobPincode,
-        jobLocation: data.jobLocation,
-        pictures: [],
-        state: data.state,
-        city: data.city,
+      console.log(data.files);
+      const formData = new FormData();
+      data.files.forEach((file) => {
+        formData.append("pictures", file);
       });
+
+      formData.append("customerId", customerId);
+      formData.append("jobName", data.jobName);
+      formData.append("jobDesc", data.jobDesc);
+      formData.append("category", data.category);
+      formData.append("isActive", data.isActive === "Active" ? true : false);
+      formData.append("jobPincode", data.jobPincode);
+      formData.append("jobLocation", data.jobLocation);
+      formData.append("state", data.state);
+      formData.append("city", data.city);
+
+      await apiConnector("POST", CREATE_JOB, formData);
+
       toast.success("Job Created successfully");
     } catch (error) {
       console.log(error);
@@ -358,24 +374,26 @@ export default function UserContextProvider({ children }) {
     }
   };
 
-  const updateProfile = async (profileData) => {
+  const updateProfile = async (formData) => {
     try {
       const userId = localStorage.getItem("UserID");
       let response = {};
       if (type == "client") {
-        await apiConnector("PUT", UPDATE_CUSTOMER_PROFILE + userId, {
-          ...profileData,
-        }).then((res) => {
+        await apiConnector(
+          "PUT",
+          UPDATE_CUSTOMER_PROFILE + userId,
+          formData
+        ).then((res) => {
           response = res;
           // response = res.data.users;
         });
       } else {
-        await apiConnector("PUT", UPDATE_SP_PROFILE + userId, {
-          ...profileData,
-        }).then((res) => {
-          response = res;
-          // response = res.data.users;
-        });
+        await apiConnector("PUT", UPDATE_SP_PROFILE + userId, formData).then(
+          (res) => {
+            response = res;
+            // response = res.data.users;
+          }
+        );
       }
       console.log(response);
       return response;
@@ -397,7 +415,61 @@ export default function UserContextProvider({ children }) {
     }
   };
 
+  const getFavLegalist = async () => {
+    const userID = localStorage.getItem("UserID");
+    try {
+      await apiConnector("GET", GET_FAV_LEGALIST + userID).then((res) => {
+        console.log(res.data.favServiceProvider);
+        return res.data.favServiceProvider;
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const useBlockNavigation = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const blockNavigation = () => {
+      // Listen to history changes
+      const handlePopState = (event) => {
+        navigate(location.pathname, { replace: true });
+      };
+
+      window.addEventListener("popstate", handlePopState);
+
+      // Clean up function to remove the event listener
+      const unblock = () => {
+        window.removeEventListener("popstate", handlePopState);
+      };
+
+      return unblock;
+    };
+
+    return blockNavigation;
+  };
+
+  const updateToken = () => {
+    setToken(localStorage.getItem("token"));
+  };
+  const selectJob = async (jobId, serviceProviderId) => {
+    try {
+      const response = await apiConnector("POST", SELECTED_IN_JOB, {
+        jobId,
+        serviceProviderId,
+      });
+      return response.data.success;
+    } catch (error) {
+      console.error(error);
+      return error;
+    }
+  };
+
   const value = {
+    selectJob,
+    useBlockNavigation,
+    updateToken,
     loading,
     setLoading,
     login,
@@ -417,6 +489,7 @@ export default function UserContextProvider({ children }) {
     changePassword,
     updateProfile,
     changeJobStatus,
+    getFavLegalist,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

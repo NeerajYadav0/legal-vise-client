@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,9 +16,21 @@ import { UserContext } from "@/context/UserContext";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useParams } from "react-router-dom";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 function ClientProfile() {
   const { id } = useParams("id");
+  const { handelRazorpay } = React.useContext(UserContext);
+  const [trigger, setTrigger] = useState(false);
+  const afterUnlock = () => {
+    setTrigger(!trigger);
+  };
   //   const [user, setUser] = useState({});
   //   const { GETCLIENTDETAILS } = endpoints;
   //   useEffect(() => {
@@ -60,7 +72,7 @@ function ClientProfile() {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [trigger]);
 
   return (
     <div className="w-11/12 flex-col justify-center mt-8">
@@ -290,10 +302,65 @@ function ClientProfile() {
               className="col-span-3"
             />
           </div>
-          <div className="flex justify-center gap-4 w-[100%] mt-5 md:w-[50%] md:justify-end">
-            {/* <Button className="w-[20%]">Cancel</Button>
-            <Button className="w-[20%]">Save</Button> */}
-          </div>
+          {type == "client" ? (
+            <div className="w-[100%]">
+              <div className="border-gray-200 border-[2px] mt-5">
+                {response?.data?.user?.pictures != 0 ? (
+                  <Carousel>
+                    <CarouselContent>
+                      {response?.data?.user?.pictures?.map((imgSrc, index) => {
+                        return (
+                          <CarouselItem key={index}>
+                            <div className="relative group w-full h-full bg-black cursor-pointer ">
+                              <img
+                                width={300}
+                                height={300}
+                                src={imgSrc}
+                                alt={`Image ${index + 1}`}
+                                className="w-full h-full object-cover transition-transform transform group-hover:scale-105 duration-300 group-hover:opacity-50"
+                                style={{
+                                  maxHeight: "300px",
+                                  minHeight: "150px",
+                                }}
+                              />
+                            </div>
+                          </CarouselItem>
+                        );
+                      })}
+                    </CarouselContent>
+                    <CarouselPrevious className="text-white bg-gray-800 opacity-75 hover:opacity-100" />
+                    <CarouselNext className="text-white bg-gray-800 opacity-75 hover:opacity-100" />
+                  </Carousel>
+                ) : (
+                  <div className="w-full flex justify-center text-gray-500">
+                    No Images Uploaded{" "}
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <></>
+          )}
+          {type == "client" ? (
+            <div className="flex justify-center gap-4 w-[100%] mt-5  md:justify-end">
+              <Button className="w-[15%]">Add to Favourite</Button>
+
+              {unlocked.includes(response?.data?.user?._id) ? (
+                <></>
+              ) : (
+                <Button
+                  className="w-[15%]"
+                  onClick={() => {
+                    handelRazorpay(id, response?.data?.user?.name, afterUnlock);
+                  }}
+                >
+                  Unlock
+                </Button>
+              )}
+            </div>
+          ) : (
+            <></>
+          )}
         </div>
       </Card>
     </div>

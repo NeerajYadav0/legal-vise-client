@@ -9,8 +9,12 @@ import {
 } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useEffect } from "react";
 
-function ProfileCard({ user, type }) {
+function ProfileCard({ user, type, fav }) {
+  useEffect(() => {
+    console.log(fav);
+  }, []);
   const navigate = useNavigate();
   //   const user = {
   //     _id: "65e6d961858c1487549a4f0f",
@@ -29,7 +33,7 @@ function ProfileCard({ user, type }) {
   //     type: "serviceProvider",
   //     wishlist: [],
   //     date: "2024-03-05T08:35:45.333Z",
-  //     createdAt: "2024-03-05T08:35:45.412Z",
+  //     createdAt: "2024-03-05T08:35:45.412Z",e
   //     updatedAt: "2024-03-05T13:24:20.032Z",
   //     profilePic:
   //       //   "https://as2.ftcdn.net/v2/jpg/02/90/27/39/1000_F_290273933_ukYZjDv8nqgpOBcBUo5CQyFcxAzYlZRW.jpg"
@@ -55,7 +59,7 @@ function ProfileCard({ user, type }) {
           <CardTitle>
             <div className="flex flex-col gap-4">
               <Avatar className="mx-auto w-[100px] h-[100px] ">
-                <AvatarImage src={user.profilePic} />
+                <AvatarImage src={user.profilePicture} />
                 <AvatarFallback className="text-5xl">
                   {getInitials(user.name)}
                 </AvatarFallback>
@@ -74,6 +78,13 @@ function ProfileCard({ user, type }) {
             <div className="flex flex-col space-y-1.5">
               Created :{differenceInDays} Days ago
             </div>
+            {type == "client" ? (
+              <div className="flex flex-col space-y-1.5">
+                Unlock count :{user?.unlock_count}
+              </div>
+            ) : (
+              <></>
+            )}
           </div>
         </CardContent>
         <CardFooter className="flex justify-between">
@@ -84,6 +95,11 @@ function ProfileCard({ user, type }) {
           >
             View Profile
           </Button>
+          {type == "client" ? (
+            <Button onClick={() => {}}>Add to Favourite</Button>
+          ) : (
+            <></>
+          )}
         </CardFooter>
       </Card>
     </div>

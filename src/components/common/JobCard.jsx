@@ -19,7 +19,7 @@ function JobCard(props) {
   const [alreadyApplied, setAlreadyApplied] = useState(false);
   const { job, index, differenceInDays, isActiveCondition } = props;
   const { handelWishlist } = useContext(UserContext);
-
+  const type = localStorage.getItem("type");
   useEffect(() => {
     getInfo();
   }, []);
@@ -59,14 +59,19 @@ function JobCard(props) {
         </div>
       </CardContent>
       <CardFooter className="flex justify-between">
-        <Button
-          onClick={() => {
-            handelWishlist(setWishlist, job._id, userID, wishlist);
-          }}
-          variant="outline"
-        >
-          {wishlist ? "Remove from Wishlist" : "Add to Wishlist"}
-        </Button>
+        {type == "client" ? (
+          <></>
+        ) : (
+          <Button
+            onClick={() => {
+              handelWishlist(setWishlist, job._id, userID, wishlist);
+            }}
+            variant="outline"
+          >
+            {wishlist ? "Remove from Wishlist" : "Add to Wishlist"}
+          </Button>
+        )}
+
         <Button
           onClick={() => {
             navigate(`/dashboard/viewJob/${job._id}`);

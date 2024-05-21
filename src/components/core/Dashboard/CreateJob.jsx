@@ -11,10 +11,19 @@ import {
 import { useContext, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { UserContext } from "@/context/UserContext";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 
 const CreateJob = () => {
   const { createJob } = useContext(UserContext);
-
+  const [files, setFiles] = useState([]);
+  const [check, setCheck] = useState(false);
   const [formData, setFormData] = useState({
     jobName: "",
     jobDesc: "",
@@ -24,7 +33,14 @@ const CreateJob = () => {
     city: "",
     jobPincode: "",
     isActive: true,
+    files: [],
   });
+
+  const handleChange = (event) => {
+    setCheck(true);
+    const selectedFiles = Array.from(event.target.files); // Convert FileList to an array
+    setFiles(selectedFiles); // Update state with the selected files
+  };
 
   const statusOptions = [
     { label: "Active", value: "Active" },
@@ -41,7 +57,9 @@ const CreateJob = () => {
       city: "",
       jobPincode: "",
       isActive: true,
+      files: [],
     });
+    setFiles([]);
   };
 
   const handleSelectChange = (name, value) => {
@@ -66,7 +84,7 @@ const CreateJob = () => {
     console.log(id);
 
     try {
-      await createJob(id, formData);
+      await createJob(id, { ...formData, files });
       setFormData({
         jobName: "",
         jobDesc: "",
@@ -76,7 +94,9 @@ const CreateJob = () => {
         city: "",
         jobPincode: "",
         isActive: null,
+        files: [],
       });
+      setFiles([]);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -187,6 +207,65 @@ const CreateJob = () => {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="city">Media</Label>
+                <Input
+                  id="photos"
+                  name="photos"
+                  type="file"
+                  multiple
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="flex flex-col space-y-1.5 mx-auto">
+                {files.length != 0 ? (
+                  <>
+                    {console.log(files)}
+                    <Carousel
+                      plugins={[
+                        Autoplay({
+                          delay: 3000,
+                        }),
+                      ]}
+                      className="lg:w-[1000px]"
+                      opts={{
+                        align: "start",
+                        loop: true,
+
+                        // interval={5000};
+                      }}
+                    >
+                      <CarouselContent>
+                        {files.map((img, index) => {
+                          const imgSrc = URL.createObjectURL(img);
+                          return (
+                            <CarouselItem key={index}>
+                              <img
+                                width={600}
+                                height={600}
+                                src={imgSrc}
+                                alt="Image 2"
+                                className="w-full h-full object-cover transition-transform transform hover:scale-105 duration-300"
+                                style={{
+                                  maxHeight: "600px",
+                                  width: "auto",
+                                  height: "auto",
+                                }}
+                              />
+                            </CarouselItem>
+                          );
+                        })}
+                      </CarouselContent>
+                      <CarouselPrevious className="text-white bg-gray-800 opacity-75 hover:opacity-100" />
+                      <CarouselNext className="text-white bg-gray-800 opacity-75 hover:opacity-100" />
+                    </Carousel>
+                  </>
+                ) : (
+                  <></>
+                )}
               </div>
             </div>
             <div className="flex justify-between mt-6">

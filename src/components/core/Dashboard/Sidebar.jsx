@@ -5,10 +5,12 @@ import { CgProfile } from "react-icons/cg";
 import { useLocation, useNavigate } from "react-router-dom";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { FaUserAlt, FaWpforms } from "react-icons/fa";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { UserContext } from "@/context/UserContext";
 
 // eslint-disable-next-line react/prop-types
 function Sidebar({ type }) {
+  const { updateToken } = useContext(UserContext);
   const location = useLocation();
   const navigate = useNavigate();
   console.log(location);
@@ -175,29 +177,58 @@ function Sidebar({ type }) {
 
             <div className="h-[1px] w-[180px] flex justify-center mx-auto bg-white my-4"></div>
 
-            <div
-              className={`relative p-2 flex items-center gap-x-2 cursor-pointer ${
-                location.pathname.includes("/wishlist")
-                  ? "bg-slate-600 text-white"
-                  : ""
-              }`}
-              onClick={() => navigate("/dashboard/wishlist")}
-            >
-              <span
-                className={`absolute left-0 top-0 h-full w-[0.15rem] bg-yellow-50 ${
-                  location.pathname.includes("/wishlist")
-                    ? "opacity-100"
-                    : "opacity-0"
+            {type == "client" ? (
+              <div
+                className={`relative p-2 flex items-center gap-x-2 cursor-pointer ${
+                  location.pathname.includes("/favourite")
+                    ? "bg-slate-600 text-white"
+                    : ""
                 }`}
-              ></span>
-              <CiBookmark className="text-xl ml-7" />
-              <h1>Wishlist</h1>
-            </div>
+                onClick={() => navigate("/dashboard/favourite")}
+              >
+                <span
+                  className={`absolute left-0 top-0 h-full w-[0.15rem] bg-yellow-50 ${
+                    location.pathname.includes("/favourite")
+                      ? "opacity-100"
+                      : "opacity-0"
+                  }`}
+                ></span>
+                <CiBookmark className="text-xl ml-7" />
+                <h1>Favourite</h1>
+              </div>
+            ) : (
+              <div
+                className={`relative p-2 flex items-center gap-x-2 cursor-pointer ${
+                  location.pathname.includes("/wishlist")
+                    ? "bg-slate-600 text-white"
+                    : ""
+                }`}
+                onClick={() => navigate("/dashboard/wishlist")}
+              >
+                <span
+                  className={`absolute left-0 top-0 h-full w-[0.15rem] bg-yellow-50 ${
+                    location.pathname.includes("/wishlist")
+                      ? "opacity-100"
+                      : "opacity-0"
+                  }`}
+                ></span>
+                <CiBookmark className="text-xl ml-7" />
+                <h1>Wishlist</h1>
+              </div>
+            )}
 
             <div className={`flex items-center gap-x-2 cursor-pointer p-2`}>
               <VscSignOut className="text-xl ml-7" />
 
-              <h1>Logout</h1>
+              <h1
+                onClick={() => {
+                  localStorage.removeItem("token");
+                  updateToken(); // Update token in context
+                  navigate("/login");
+                }}
+              >
+                Logout
+              </h1>
             </div>
           </div>
         </div>
@@ -351,29 +382,58 @@ function Sidebar({ type }) {
 
               <div className="h-[1px] w-[180px] flex justify-center mx-auto bg-white my-4"></div>
 
-              <div
-                className={`relative p-2 flex items-center gap-x-2 cursor-pointer ${
-                  location.pathname.includes("/wishlist")
-                    ? "bg-slate-600 text-white"
-                    : ""
-                }`}
-                onClick={() => navigate("/dashboard/wishlist")}
-              >
-                <span
-                  className={`absolute left-0 top-0 h-full w-[0.15rem] bg-yellow-50 ${
+              {type == "client" ? (
+                <div
+                  className={`relative p-2 flex items-center gap-x-2 cursor-pointer ${
                     location.pathname.includes("/wishlist")
-                      ? "opacity-100"
-                      : "opacity-0"
+                      ? "bg-slate-600 text-white"
+                      : ""
                   }`}
-                ></span>
-                <CiBookmark className="text-xl ml-7" />
-                <h1>Wishlist</h1>
-              </div>
+                  onClick={() => navigate("/dashboard/wishlist")}
+                >
+                  <span
+                    className={`absolute left-0 top-0 h-full w-[0.15rem] bg-yellow-50 ${
+                      location.pathname.includes("/wishlist")
+                        ? "opacity-100"
+                        : "opacity-0"
+                    }`}
+                  ></span>
+                  <CiBookmark className="text-xl ml-7" />
+                  <h1>Favourite</h1>
+                </div>
+              ) : (
+                <div
+                  className={`relative p-2 flex items-center gap-x-2 cursor-pointer ${
+                    location.pathname.includes("/wishlist")
+                      ? "bg-slate-600 text-white"
+                      : ""
+                  }`}
+                  onClick={() => navigate("/dashboard/wishlist")}
+                >
+                  <span
+                    className={`absolute left-0 top-0 h-full w-[0.15rem] bg-yellow-50 ${
+                      location.pathname.includes("/wishlist")
+                        ? "opacity-100"
+                        : "opacity-0"
+                    }`}
+                  ></span>
+                  <CiBookmark className="text-xl ml-7" />
+                  <h1>Wishlist</h1>
+                </div>
+              )}
 
               <div className={`flex items-center gap-x-2 cursor-pointer p-2`}>
                 <VscSignOut className="text-xl ml-7" />
 
-                <h1>Logout</h1>
+                <h1
+                  onClick={() => {
+                    localStorage.removeItem("token");
+                    updateToken(); // Update token in context
+                    navigate("/login");
+                  }}
+                >
+                  Logout
+                </h1>
               </div>
             </div>
           </div>

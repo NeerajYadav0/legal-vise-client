@@ -25,3 +25,15 @@ html, body{
 .view-job-image:hover{
   filter: blur(7px);
 }
+
+.group:hover .group-hover:scale-105 {
+  transform: scale(1.05);
+}
+
+.group:hover .group-hover:opacity-50 {
+  opacity: 0.5;
+}
+
+.group:hover .group-hover:opacity-100 {
+  opacity: 1;
+}

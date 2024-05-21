@@ -37,6 +37,14 @@ import { UserContext } from "@/context/UserContext";
 
 import Table from "@/components/common/CollapsibleTable";
 import EnhancedTable from "@/components/common/EnhancedTable";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 
 function ViewJob() {
   // test code
@@ -76,8 +84,9 @@ function ViewJob() {
   const { id } = useParams("id");
   const jobId = id;
   const { APPLYJOB, GETONEJOB, CHECKINTERESTED } = endpoints;
-  const { handelWishlist, type } = useContext(UserContext);
+  const { handelWishlist } = useContext(UserContext);
   const [status, setStatus] = useState(true);
+  const type = localStorage.getItem("type");
 
   const navigate = useNavigate();
   const [selectedPrice, setSelectedPrice] = useState();
@@ -113,6 +122,7 @@ function ViewJob() {
     await apiConnector("get", `${GETONEJOB}/${jobId}`, {}, "", "").then(
       (res) => {
         // setJob(res.data?.job);
+        console.log(res.data.job);
         setJob(res.data.job);
         setStatus(res?.data?.job?.isActive);
       }
@@ -242,6 +252,8 @@ function ViewJob() {
                       interested={job?.interested}
                       rows={rows}
                       getUnlocked={getUnlocked}
+                      jobId={jobId}
+                      selectedUserId={job?.selected}
                     />
                   </div>
                 ) : (
@@ -261,7 +273,7 @@ function ViewJob() {
                 <Button
                   variant="outline"
                   onClick={() => {
-                    navigate(`/dashboard/client-profile/${job.customerId}`);
+                    navigate(`/dashboard/user-profile/${job.customerId}`);
                   }}
                 >
                   View Customer Profile
@@ -400,12 +412,71 @@ function ViewJob() {
             )}
           </CardFooter>
         </Card>
-        <div className=" relative w-[30%] h-[300px] flex hover:scale-110 duration-500">
-          <div className="w-full h-full view-job-image rounded-lg flex justify-center text-black  "></div>
-          <div className="absolute font-bold top-[40%] left-[15%] text-5xl ">
-            View Images
-          </div>
-        </div>
+        <Drawer>
+          <DrawerTrigger asChild>
+            <div className=" relative w-[30%] h-[300px] flex hover:scale-110 duration-500">
+              <div className="w-full h-full view-job-image rounded-lg flex justify-center text-black  "></div>
+              <div className="absolute font-bold top-[40%] left-[15%] text-5xl ">
+                View Images
+              </div>
+            </div>
+          </DrawerTrigger>
+          <DrawerContent>
+            <div className=" mx-auto w-full max-w-sm">
+              {/* <DrawerHeader>
+                <DrawerTitle>Image</DrawerTitle>
+                <DrawerDescription>Job related image.</DrawerDescription>
+              </DrawerHeader> */}
+              <div className="flex flex-col md:flex-row justify-evenly w-full min-h-[100px] ">
+                <div className="flex flex-col  items-center">
+                  <Carousel
+                    plugins={[
+                      Autoplay({
+                        delay: 3000,
+                      }),
+                    ]}
+                    className="lg:w-auto"
+                    opts={{
+                      align: "start",
+                      loop: true,
+
+                      // interval={5000};
+                    }}
+                  >
+                    <CarouselContent>
+                      {job?.pictures?.map((imgSrc, index) => {
+                        return (
+                          <CarouselItem key={index}>
+                            <img
+                              width={300}
+                              height={300}
+                              src={imgSrc}
+                              alt="Image 2"
+                              className="w-full h-full object-cover transition-transform transform hover:scale-105 duration-300"
+                              style={{
+                                maxHeight: "300px",
+                                minHeight: "150px",
+                                width: "auto",
+                                height: "auto",
+                              }}
+                            />
+                          </CarouselItem>
+                        );
+                      })}
+                    </CarouselContent>
+                    <CarouselPrevious className="text-white bg-gray-800 opacity-75 hover:opacity-100" />
+                    <CarouselNext className="text-white bg-gray-800 opacity-75 hover:opacity-100" />
+                  </Carousel>
+                  <DrawerClose asChild>
+                    <Button variant="outline" className="my-5">
+                      Close
+                    </Button>
+                  </DrawerClose>
+                </div>
+              </div>
+            </div>
+          </DrawerContent>
+        </Drawer>
       </div>
     </div>
   );

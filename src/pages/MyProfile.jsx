@@ -19,7 +19,6 @@ import { Textarea } from "@/components/ui/textarea";
 
 function MyProfile() {
   const { name, setName, getDetails, response } = useContext(UserContext);
-
   useEffect(() => {
     const email = localStorage.getItem("email");
     const type = localStorage.getItem("type");
@@ -118,7 +117,7 @@ function MyProfile() {
             </Label>
             <Input
               id="gender"
-              placeholder="Please enter your name..."
+              placeholder="Please enter your gender"
               className="col-span-3"
             />
           </div>

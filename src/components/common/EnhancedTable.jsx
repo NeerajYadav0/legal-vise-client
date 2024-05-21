@@ -117,6 +117,12 @@ const headCells = [
     disablePadding: false,
     label: "Action",
   },
+  {
+    id: "Select",
+    numeric: false,
+    disablePadding: false,
+    label: "Select for job",
+  },
 ];
 
 function EnhancedTableHead(props) {
@@ -260,7 +266,24 @@ EnhancedTableToolbar.propTypes = {
 //   //     createData(15, "Neeraj Yadav", "i am a very good lawyer", "1000-2000"),
 // ];
 // var rows = [];
-export default function EnhancedTable({ interested, rows, getUnlocked }) {
+export default function EnhancedTable({
+  interested,
+  rows,
+  getUnlocked,
+  jobId,
+  selectedUserId,
+}) {
+  const [selectedId, setSelectedId] = React.useState("");
+  React.useEffect(() => {
+    console.log(selectedUserId);
+    setSelectedId(selectedUserId);
+  });
+  const handelSelect = async (serviceProviderId) => {
+    return await selectJob(jobId, serviceProviderId).then((data) => {
+      return data;
+    });
+  };
+  const { selectJob } = React.useContext(UserContext);
   const { handelRazorpay } = React.useContext(UserContext);
   //   var [rows, setRows] = React.useState([]);
   const navigate = useNavigate();
@@ -418,6 +441,21 @@ export default function EnhancedTable({ interested, rows, getUnlocked }) {
                         }}
                       >
                         {row?.unlocked ? "View Profile" : "Unlock"}
+                      </Button>
+                    </TableCell>
+                    <TableCell align="center">
+                      {" "}
+                      <Button
+                        className=" w-24 text-sm"
+                        onClick={() => {
+                          if (handelSelect(row.id)) {
+                            console.log("entered");
+                            setSelectedId(row.id);
+                          }
+                        }}
+                        disabled={row?.unlocked !== true || selectedId !== ""}
+                      >
+                        {selectedId == row?.id ? "Selected" : "Select"}
                       </Button>
                     </TableCell>
                   </TableRow>

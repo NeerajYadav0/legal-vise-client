@@ -9,6 +9,7 @@ import Error from "./components/common/Error";
 import MyProfile from "./components/core/Dashboard/MyProfile";
 import Dashboard from "./pages/Dashboard";
 import Translate from "./components/common/Translate";
+import PrivateRoute from "./components/common/PrivateRoute";
 
 function App() {
   return (
@@ -19,9 +20,30 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/error" element={<Error />} />
-        <Route path="/create-job" element={<MyProfile />} />
-        <Route path="/dashboard/:selection" element={<Dashboard />} />
-        <Route path="/dashboard/:selection/:id" element={<Dashboard />} />
+        <Route
+          path="/create-job"
+          element={
+            <PrivateRoute>
+              <MyProfile />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dashboard/:selection"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dashboard/:selection/:id"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        />
       </Routes>
       <Translate />
       <Footer />

@@ -1,8 +1,8 @@
 import axios from "axios";
 
 export const axiosInstance = axios.create({});
-export const token = localStorage.getItem("token");
 export const apiConnector = (method, url, bodyData, headers, params) => {
+  const token = localStorage.getItem("token");
   return axiosInstance({
     method: `${method}`,
     url: `${url}`,

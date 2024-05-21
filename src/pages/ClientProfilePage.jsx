@@ -3,9 +3,10 @@ import { UserContext } from "@/context/UserContext";
 import { useContext, useEffect, useState } from "react";
 
 function ClientProfilePage() {
-  const { getSimilarUsers } = useContext(UserContext);
+  const { getSimilarUsers, getFavLegalist } = useContext(UserContext);
   const type = localStorage.getItem("type");
   const [res, setRes] = useState([]);
+  const [favServiceProvider, setFavServiceProvider] = useState([]);
   const searchClients = async (name) => {
     setRes(await getSimilarUsers(name, type));
     console.log(res);
@@ -14,6 +15,19 @@ function ClientProfilePage() {
   useEffect(() => {
     getSimilarUsers("");
   });
+
+  useEffect(() => {
+    if (type == "client") {
+      getFavLegalist()
+        .then((data) => {
+          setFavServiceProvider(data);
+          console.log(data); // Log the data received from the promise
+        })
+        .catch((err) => {
+          console.error("Error:", err); // Handle any errors
+        });
+    }
+  }, [res]);
 
   return (
     <div className="w-11/12 flex-col justify-center mt-8">
@@ -54,7 +68,17 @@ function ClientProfilePage() {
         </div>
         <div className="w-[80%] mx-auto flex flex-wrap justify-between">
           {res?.map((user, index) => {
-            return <ProfileCard key={index} user={user} type={type} />;
+            return (
+              <ProfileCard
+                key={index}
+                user={user}
+                type={type}
+                fav={
+                  Array.isArray(favServiceProvider) &&
+                  favServiceProvider?.includes(user._id || "")
+                }
+              />
+            );
           })}
           {/* <ProfileCard />
           <ProfileCard />

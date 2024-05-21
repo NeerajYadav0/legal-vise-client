@@ -20,16 +20,55 @@ import { Textarea } from "@/components/ui/textarea";
 import { formattedDate } from "@/utils/dateFormatter";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { apiConnector } from "@/services/apiConnector";
+import { endpoints } from "@/services/apis";
 // import { useHistory } from "react-router-dom";
 
 function MyProfile() {
   // const history = useHistory();
+  const [numberOfJobs, setNumeberOfJobs] = useState(0);
+  const getJobs = async () => {
+    try {
+      const type = localStorage.getItem("type");
+      const userId = localStorage.getItem("UserID");
 
+      const response = await apiConnector(
+        "get",
+        type === "client"
+          ? `${endpoints.CUSTOMER_JOBS}${userId}`
+          : endpoints.GETALLJOBS,
+        "",
+        "",
+        ""
+      );
+
+      // Check if the response and the data are properly received
+      if (response && response.data) {
+        setNumeberOfJobs(response.data.length);
+      } else {
+        console.error("Invalid response or response data:", response);
+      }
+    } catch (error) {
+      console.error("Error fetching jobs:", error);
+    }
+  };
   const { name, setName, getDetails, changePassword, updateProfile } =
     useContext(UserContext);
   const [currentPassword, setCurrentPassword] = useState(undefined);
   const [newPassword, setNewPassword] = useState(undefined);
   const [response, setResponse] = useState({});
+  const [profilePictureFile, setProfilePictureFile] = useState(null);
+  const [profileUpdated, setProfileUpdated] = useState(false);
+  const type = localStorage.getItem("type");
+  const [picturesFiles, setPicturesFiles] = useState([]);
 
   // defining use form
   const {
@@ -41,18 +80,23 @@ function MyProfile() {
     reset,
   } = useForm({
     defaultValues: {
-      gender: "", // Set default values here
-      dateofbirth: "",
+      gender: response?.data?.user?.gender || "", // Set default values here
+      dob: response?.data?.user?.dob || "",
       phoneNumber: response?.data?.user?.phoneNumber || "", // Set default value from response
       city: response?.data?.user?.city || "",
       state: response?.data?.user?.state || "",
       aadharNumber: response?.data?.user?.aadharNumber || "",
       createdAt: formattedDate(response?.data?.user?.createdAt) || "",
       jobs: "", // You can set default values as needed
+      name: response?.data?.user?.name || "",
+      profilePicture: response?.data?.user?.profilePicture || "",
+      pictures: response?.data?.user?.pictures || "",
+      about: response?.data?.user?.about || "",
     },
   });
 
   useEffect(() => {
+    getJobs();
     const email = localStorage.getItem("email");
     const type = localStorage.getItem("type");
     console.log(type);
@@ -62,19 +106,39 @@ function MyProfile() {
     });
     console.log(response);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [profileUpdated]);
   useEffect(() => {
     reset({
-      gender: "", // Set default values here
-      dateofbirth: "",
+      gender: response?.data?.user?.gender || "", // Set default values here
+      dob: response?.data?.user?.dob || "",
+
       phoneNumber: response?.data?.user?.phoneNumber || "", // Set default value from response
       city: response?.data?.user?.city || "",
       state: response?.data?.user?.state || "",
       aadharNumber: response?.data?.user?.aadharNumber || "",
       createdAt: formattedDate(response?.data?.user?.createdAt) || "",
       jobs: "", // You can set default values as needed
+      name: response?.data?.user?.name || "",
+      profilePicture: response?.data?.user?.profilePicture || "",
+      pictures: response?.data?.user?.pictures || "",
+      about: response?.data?.user?.about || "",
     });
   }, [response]);
+
+  const handleProfilePictureChange = (event) => {
+    setProfilePictureFile(event.target.files[0]);
+  };
+  const handlePicturesChange = (event) => {
+    setPicturesFiles([...event.target.files]);
+  };
+
+  const getInitials = () => {
+    const words = response?.data?.user?.name?.split(" ") || " ";
+    const firstNameInitial = words[0][0]?.toUpperCase();
+    const lastNameInitial = words[words.length - 1][0]?.toUpperCase();
+    return firstNameInitial + lastNameInitial;
+  };
+
   const handelChangePassword = async () => {
     // changePassword(currentPassword, newPassword);
     console.log(currentPassword);
@@ -93,19 +157,43 @@ function MyProfile() {
     }
   };
   const handelProfileUpdate = async () => {
-    await updateProfile(getValues()).then((res) => {
+    const formData = new FormData();
+    const data = getValues();
+    Object.keys(data).forEach((key) => {
+      formData.append(key, data[key]);
+    });
+    if (profilePictureFile) {
+      formData.append("profilePicture", profilePictureFile);
+    }
+    if (picturesFiles) {
+      picturesFiles.forEach((file) => {
+        formData.append("pictures", file);
+      });
+    }
+    // Log the contents of formData
+    for (let [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
+
+    await updateProfile(formData).then((res) => {
       if (res.data.success) {
         reset({
-          gender: "", // Set default values here
-          dateofbirth: "",
+          gender: response?.data?.user?.gender || "", // Set default values here
+          dob: response?.data?.user?.dob || "",
+
           phoneNumber: res?.data?.updatedProfile?.phoneNumber || "", // Set default value from response
           city: res?.data?.updatedProfile?.city || "",
           state: res?.data?.updatedProfile?.state || "",
           aadharNumber: res?.data?.updatedProfile?.aadharNumber || "",
           createdAt: formattedDate(res?.data?.updatedProfile?.createdAt) || "",
           jobs: "", // You can set default values as needed
+          name: response?.data?.user?.name || "",
+          profilePicture: response?.data?.user?.profilePicture || "",
+          pictures: response?.data?.user?.pictures || "",
+          about: response?.data?.user?.about || "",
         });
         toast.success("Updated Profile");
+        setProfileUpdated((prev) => !prev); // Trigger the useEffect
       } else {
         toast.error("Some error occured");
       }
@@ -117,6 +205,46 @@ function MyProfile() {
     reset();
     toast.success("Data reseated");
   };
+
+  const handelDeleteImage = async (index) => {
+    console.log("delete image");
+    const confirmDelete = window.confirm(
+      "Do you really want to delete this image?"
+    );
+    if (confirmDelete) {
+      const updatedPictures = response?.data?.user?.pictures.filter(
+        (_, i) => i !== index
+      );
+      const formData = new FormData();
+      formData.append("pictures", updatedPictures);
+
+      await updateProfile(formData).then((res) => {
+        if (res.data.success) {
+          reset({
+            gender: response?.data?.user?.gender || "", // Set default values here
+            dob: response?.data?.user?.dob || "",
+
+            phoneNumber: res?.data?.updatedProfile?.phoneNumber || "", // Set default value from response
+            city: res?.data?.updatedProfile?.city || "",
+            state: res?.data?.updatedProfile?.state || "",
+            aadharNumber: res?.data?.updatedProfile?.aadharNumber || "",
+            createdAt:
+              formattedDate(res?.data?.updatedProfile?.createdAt) || "",
+            jobs: "", // You can set default values as needed
+            name: response?.data?.user?.name || "",
+            profilePicture: response?.data?.user?.profilePicture || "",
+            pictures: response?.data?.user?.pictures || "",
+            about: response?.data?.user?.about || "",
+          });
+          toast.success("Updated Profile");
+          setProfileUpdated((prev) => !prev); // Trigger the useEffect
+        } else {
+          toast.error("Some error occured");
+        }
+      });
+    }
+  };
+
   return (
     <div className="w-11/12 flex-col justify-center mt-8">
       <h1 className="text-3xl mb-8">My Profile</h1>
@@ -125,11 +253,12 @@ function MyProfile() {
       <Card className="w-[90%] md:p-16 p-5 md:flex md:justify-between ">
         <div className="gap-x-7 md:flex items-center ">
           <div className="h-24 w-24">
-            <img
-              src={photo}
-              alt=""
-              className="rounded-full h-[100%] w-[100%] flex items-center"
-            />
+            <Avatar className="mx-auto w-[100px] h-[100px] ">
+              <AvatarImage src={response?.data?.user?.profilePicture} />
+              <AvatarFallback className="text-5xl">
+                {getInitials()}
+              </AvatarFallback>
+            </Avatar>
           </div>
           <div className="font-bold text-lg mt-4 md:mt-0">
             <h1 className="uppercase">Name: {response?.data?.user?.name}</h1>
@@ -173,14 +302,32 @@ function MyProfile() {
                     placeholder="Please enter your name..."
                     defaultValue={name}
                     className="col-span-3"
-                    onChange={(e) => setName(e.target.value)}
+                    {...register("name")}
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label
+                    htmlFor="name"
+                    className="text-right w-[100%] flex justify-center"
+                  >
+                    Profile Picture
+                  </Label>
+                  <Input
+                    id="profilePicture"
+                    name="profilePicture"
+                    type="file"
+                    className="col-span-3"
+                    onChange={handleProfilePictureChange}
                   />
                 </div>
               </div>
               <DialogClose asChild>
                 <Button
                   className="w-[30%] mx-auto"
-                  // onClick={() => setUserName(name)}
+                  onClick={() => {
+                    setName(getValues("name"));
+                    handelProfileUpdate();
+                  }}
                 >
                   Save changes
                 </Button>
@@ -207,7 +354,7 @@ function MyProfile() {
               <Input
                 {...register("gender")}
                 id="gender"
-                placeholder="Please enter your name..."
+                placeholder="Please enter your gender"
                 className="col-span-3"
               />
             </div>
@@ -221,8 +368,8 @@ function MyProfile() {
               </Label>
               <Input
                 type="date"
-                {...register("dateofbirth")}
-                id="dateofbirth"
+                {...register("dob")}
+                id="dob"
                 placeholder="Please enter your name..."
                 className="col-span-3"
               />
@@ -318,27 +465,98 @@ function MyProfile() {
                 About
               </Label>
               <Textarea
+                id="about"
                 placeholder="Type your message here."
                 className="md:w-[300px] w-[80%]"
                 {...register("about")}
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4 w-[100%] md:w-[50%]">
-              <Label
-                htmlFor="jobs"
-                className="text-right w-[100%] flex justify-center"
-              >
-                Number of Jobs
-              </Label>
-              <Input
-                id="jobs"
-                placeholder="Please enter your name..."
-                className="col-span-3"
-                readOnly
-                {...register("jobs")}
-              />
-            </div>
-            <div className="flex justify-center gap-4 w-[100%] mt-5 md:w-[50%] md:justify-end flex-wrap">
+            {type == "client" ? (
+              <div className="grid grid-cols-4 items-center gap-4 w-[100%] md:w-[50%]">
+                <Label
+                  htmlFor="jobs"
+                  className="text-right w-[100%] flex justify-center"
+                >
+                  Number of Jobs
+                </Label>
+                <Input
+                  id="jobs"
+                  className="col-span-3"
+                  readOnly
+                  value={numberOfJobs}
+                />
+              </div>
+            ) : (
+              <></>
+            )}
+            {type != "client" ? (
+              <div className="w-[100%]">
+                <div className="grid grid-cols-4 items-center gap-4 w-[100%] md:w-[50%]">
+                  <Label
+                    htmlFor="name"
+                    className="text-right w-[100%] flex justify-center"
+                  >
+                    Add Documents
+                  </Label>
+                  <Input
+                    id="pictures"
+                    name="pictures"
+                    type="file"
+                    multiple
+                    className="col-span-3"
+                    onChange={handlePicturesChange}
+                  />
+                </div>
+                <div className="border-gray-200 border-[2px] mt-5">
+                  {response?.data?.user?.pictures != 0 ? (
+                    <Carousel>
+                      <CarouselContent>
+                        {response?.data?.user?.pictures?.map(
+                          (imgSrc, index) => {
+                            return (
+                              <CarouselItem key={index}>
+                                <div
+                                  className="relative group w-full h-full bg-black cursor-pointer "
+                                  onClick={() => {
+                                    handelDeleteImage(index);
+                                  }}
+                                >
+                                  <img
+                                    width={300}
+                                    height={300}
+                                    src={imgSrc}
+                                    alt={`Image ${index + 1}`}
+                                    className="w-full h-full object-cover transition-transform transform group-hover:scale-105 duration-300 group-hover:opacity-50"
+                                    style={{
+                                      maxHeight: "300px",
+                                      minHeight: "150px",
+                                    }}
+                                  />
+                                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    <span className="text-white text-3xl font-semibold">
+                                      Delete Image
+                                    </span>
+                                  </div>
+                                </div>
+                              </CarouselItem>
+                            );
+                          }
+                        )}
+                      </CarouselContent>
+                      <CarouselPrevious className="text-white bg-gray-800 opacity-75 hover:opacity-100" />
+                      <CarouselNext className="text-white bg-gray-800 opacity-75 hover:opacity-100" />
+                    </Carousel>
+                  ) : (
+                    <div className="w-full flex justify-center text-gray-500">
+                      No Images Uploaded{" "}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <></>
+            )}
+            <div className="flex justify-center gap-4 w-[100%] mt-5   flex-wrap">
               {/* <Button className="w-[20%]" onClick={()=>{ handelChangePassword()}}>Change Password</Button> */}
               <>
                 <Dialog>
