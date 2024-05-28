@@ -59,6 +59,7 @@ function EducationalVideo() {
     formData.append("title", title);
     formData.append("video", files[0]);
     await videoUpload(formData).then(() => {});
+    setAlert(" ");
     setAlert("");
     setTitle("");
     setFiles([]);

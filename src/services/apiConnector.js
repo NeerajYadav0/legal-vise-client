@@ -11,6 +11,8 @@ export const apiConnector = (method, url, bodyData, headers, params) => {
       ? headers
       : {
           Authorization: `Bearer ${token}`,
+          "Access-Control-Allow-Origin":
+            "https://legal-vise-client-nmhxqnfpk-neerajyadav0s-projects.vercel.app",
         },
     params: params ? params : null,
   });
