@@ -38,6 +38,21 @@ export default function UserContextProvider({ children }) {
     CHANGE_JOB_STATUS,
     GET_FAV_LEGALIST,
     SELECTED_IN_JOB,
+    JOB_CONFIRMATION,
+    ADD_RATING,
+    ELIGIBLE_RATING_USERS,
+    REMOVE_FAV_LEGALIST,
+    ADD_FAV_LEGALIST,
+    GETDETAILSMULTIPLE,
+    ADMIN_LOGIN_API,
+    REPORTUSER,
+    GET_ALL_REPORTED_USERS,
+    GET_ALL_REPORTS_OF_USER,
+    BLOCK,
+    UNBLOCK,
+    VIDEO_UPLOAD,
+    DELETE_VIDEO,
+    ALL_VIDEO,
   } = endpoints;
 
   useEffect(() => {
@@ -70,7 +85,11 @@ export default function UserContextProvider({ children }) {
           response = res;
         });
       }
-
+      if (response.data.user.blocked) {
+        toast.error("User log in unsuccesfull");
+        toast.dismiss(toastId);
+        return response;
+      }
       setLoading(false);
       setName(response.data.user.name);
       setToken(response.data.token);
@@ -81,6 +100,38 @@ export default function UserContextProvider({ children }) {
       localStorage.setItem("token", response.data.token);
 
       toast.success("User logged in succesfully");
+      toast.dismiss(toastId);
+      return response;
+    } catch (error) {
+      console.log(error);
+      toast.error("User log in unsuccesfull");
+    }
+    toast.dismiss(toastId);
+  }
+  async function adminLogin(email, password) {
+    const toastId = toast.loading("Loading...");
+    const type = "admin";
+    setType(type);
+    try {
+      setLoading(true);
+      localStorage.setItem("type", type);
+      let response = {};
+
+      await apiConnector("POST", ADMIN_LOGIN_API, {
+        email,
+        password,
+      }).then((res) => {
+        response = res;
+      });
+
+      setLoading(false);
+      setToken(response.data.token);
+      localStorage.setItem("email", response?.data?.user?.email);
+      localStorage.setItem("type", type);
+      localStorage.setItem("UserID", response?.data?.user?._id);
+      localStorage.setItem("token", response.data.token);
+
+      toast.success("Admin logged in succesfully");
       toast.dismiss(toastId);
       return response;
     } catch (error) {
@@ -418,12 +469,67 @@ export default function UserContextProvider({ children }) {
   const getFavLegalist = async () => {
     const userID = localStorage.getItem("UserID");
     try {
-      await apiConnector("GET", GET_FAV_LEGALIST + userID).then((res) => {
-        console.log(res.data.favServiceProvider);
-        return res.data.favServiceProvider;
-      });
+      const res = await apiConnector("GET", GET_FAV_LEGALIST + userID);
+      console.log(res.data.favServiceProvider);
+      return res.data.favServiceProvider;
     } catch (err) {
       console.log(err);
+      throw err; // rethrow the error to be caught in the useEffect
+    }
+  };
+
+  // const addFavLegalist = async (legalistId) => {
+  //   const clientId = localStorage.getItem("UserID");
+  //   try {
+  //     await apiConnector("GET", ADD_FAV_LEGALIST, {
+  //       clientId,
+  //       legalistId,
+  //     }).then((res) => {
+  //       console.log(res.data.favServiceProvider);
+  //       return res.data.favServiceProvider;
+  //     });
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
+  // const removeFavLegalist = async (legalistId) => {
+  //   const clientId = localStorage.getItem("UserID");
+  //   try {
+  //     await apiConnector("GET", REMOVE_FAV_LEGALIST, {
+  //       clientId,
+  //       legalistId,
+  //     }).then((res) => {
+  //       console.log(res.data.favServiceProvider);
+  //       return res.data.favServiceProvider;
+  //     });
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
+
+  const handelFav = async (setFav, legalistId, fav) => {
+    const clientId = localStorage.getItem("UserID");
+    try {
+      const toastId = toast.loading("Loading...");
+      if (fav) {
+        await apiConnector("DELETE", REMOVE_FAV_LEGALIST, {
+          legalistId,
+          clientId,
+        });
+        toast.success("Removed from Fav");
+        toast.dismiss(toastId);
+        setFav(!fav);
+      } else {
+        await apiConnector("POST", ADD_FAV_LEGALIST, {
+          legalistId,
+          clientId,
+        });
+        toast.success("Added to Fav");
+        toast.dismiss(toastId);
+        setFav(!fav);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -465,8 +571,175 @@ export default function UserContextProvider({ children }) {
       return error;
     }
   };
+  const handelConfirmation = async (jobId, serviceProviderId, setConfirm) => {
+    try {
+      const response = await apiConnector("POST", JOB_CONFIRMATION, {
+        jobId,
+        serviceProviderId,
+      });
+      setConfirm(true);
+      return response.data.success;
+    } catch (error) {
+      console.error(error);
+      return error;
+    }
+  };
 
+  const addRating = async (serviceProviderId, comment, rating) => {
+    try {
+      const response = await apiConnector("POST", ADD_RATING, {
+        serviceProviderId,
+        comment,
+        rating,
+        customerId: localStorage.getItem("UserID"),
+      });
+      alert("rating added successfully");
+      return response.data.success;
+    } catch (error) {
+      console.error(error);
+      return error;
+    }
+  };
+  const ReadyForRatingUsers = async () => {
+    try {
+      const response = await apiConnector(
+        "GET",
+        ELIGIBLE_RATING_USERS + localStorage.getItem("UserID")
+      );
+      console.log(response.data.data);
+      return response.data.data;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getDetailsSP = async (ids) => {
+    try {
+      const response = await apiConnector("POST", GETDETAILSMULTIPLE, {
+        ids: ids,
+      });
+      console.log(response.data);
+      return response.data;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const report = async (reportedUserId, comments) => {
+    const toastId = toast.loading("Loading...");
+    const userID = localStorage.getItem("UserID");
+    const type = localStorage.getItem("type");
+    try {
+      const response = await apiConnector("POST", REPORTUSER, {
+        reportedUserId: reportedUserId,
+        reportedBy: userID,
+        comments: comments,
+        reportedByType: type,
+      });
+      console.log(response.data);
+      toast.success("User Reported");
+      toast.dismiss(toastId);
+    } catch (error) {
+      toast.dismiss(toastId);
+      console.error(error);
+    }
+  };
+  const allReportedUsers = async () => {
+    const toastId = toast.loading("Loading...");
+    try {
+      const response = await apiConnector("GET", GET_ALL_REPORTED_USERS);
+      console.log(response.data);
+      toast.success("Data Fetched");
+      toast.dismiss(toastId);
+      return response;
+    } catch (error) {
+      toast.dismiss(toastId);
+      console.error(error);
+    }
+  };
+  const allReportsOfUser = async (id) => {
+    const toastId = toast.loading("Loading...");
+    try {
+      const response = await apiConnector(
+        "GET",
+        `${GET_ALL_REPORTS_OF_USER}${id}`
+      );
+      console.log(response.data);
+      toast.success("Data Fetched");
+      toast.dismiss(toastId);
+      return response.data;
+    } catch (error) {
+      toast.dismiss(toastId);
+      console.error(error);
+    }
+  };
+  const blockUser = async (id, type) => {
+    const toastId = toast.loading("Loading...");
+    try {
+      const response = await apiConnector("POST", BLOCK, { id, type });
+      console.log(response.data);
+      toast.success("User Blocked");
+      toast.dismiss(toastId);
+    } catch (error) {
+      toast.dismiss(toastId);
+      console.error(error);
+    }
+  };
+  const unblockUser = async (id, type) => {
+    const toastId = toast.loading("Loading...");
+    try {
+      const response = await apiConnector("POST", UNBLOCK, { id, type });
+      console.log(response.data);
+      toast.success("User Unblocked");
+      toast.dismiss(toastId);
+    } catch (error) {
+      toast.dismiss(toastId);
+      console.error(error);
+    }
+  };
+  const videoUpload = async (formData) => {
+    const toastId = toast.loading("Loading...");
+    try {
+      const response = await apiConnector("POST", VIDEO_UPLOAD, formData);
+      console.log(response.data);
+      toast.success("Video Uploaded");
+      toast.dismiss(toastId);
+    } catch (error) {
+      toast.error("Error in video upload");
+      toast.dismiss(toastId);
+      console.error(error);
+    }
+  };
+  const getVideo = async () => {
+    const toastId = toast.loading("Loading...");
+    try {
+      const response = await apiConnector("GET", ALL_VIDEO);
+      console.log(response.data);
+      toast.success("Got all Videos");
+      toast.dismiss(toastId);
+      return response.data;
+    } catch (error) {
+      toast.error("Error in getting video");
+      toast.dismiss(toastId);
+      console.error(error);
+    }
+  };
+  const deleteVideo = async (id) => {
+    const toastId = toast.loading("Loading...");
+    try {
+      const response = await apiConnector("DELETE", DELETE_VIDEO + id);
+      console.log(response.data);
+      toast.success("Deleted Video");
+      toast.dismiss(toastId);
+      return response.data;
+    } catch (error) {
+      toast.error("Error in deleting video");
+      toast.dismiss(toastId);
+      console.error(error);
+    }
+  };
   const value = {
+    ReadyForRatingUsers,
+    handelConfirmation,
     selectJob,
     useBlockNavigation,
     updateToken,
@@ -490,6 +763,19 @@ export default function UserContextProvider({ children }) {
     updateProfile,
     changeJobStatus,
     getFavLegalist,
+    addRating,
+    setResponse,
+    handelFav,
+    getDetailsSP,
+    adminLogin,
+    report,
+    allReportedUsers,
+    allReportsOfUser,
+    unblockUser,
+    blockUser,
+    videoUpload,
+    getVideo,
+    deleteVideo,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

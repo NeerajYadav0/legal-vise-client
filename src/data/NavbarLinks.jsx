@@ -16,7 +16,7 @@ export const NavbarLinks = [
     path: "/contact",
   },
   {
-    title: "Testimonials",
-    path: "/Testimonials",
+    title: "Help",
+    path: "/help",
   },
 ];

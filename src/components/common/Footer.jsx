@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 // Icons
 import { FaFacebook, FaGoogle, FaTwitter, FaYoutube } from "react-icons/fa";
 import { useEffect } from "react";
+import AdminLoginText from "./AdminLoginText";
 
 const BottomFooter = ["Privacy Policy", "Cookie Policy", "Terms"];
 // const Resources = [
@@ -106,6 +107,7 @@ const Footer = () => {
                 </div>
               );
             })}
+            <AdminLoginText />
           </div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import ReportIcon from "@mui/icons-material/Report";
 
 import { Label } from "@/components/ui/label";
 import {
@@ -11,7 +12,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-// import photo from "../assets/images/homePageImg1.jpg";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { UserContext } from "@/context/UserContext";
 import { Card } from "@/components/ui/card";
@@ -24,143 +24,85 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import HoverRating from "@/components/common/HoverRating";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import ReportIcon from "@mui/icons-material/Report";
+import TableForReport from "@/components/common/TableForReport";
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
-import GradeIcon from "@mui/icons-material/Grade";
-
-function ClientProfile() {
-  const [reason, setReason] = useState("");
+function AdminProfileView() {
   const { id } = useParams("id");
-  const { handelRazorpay, report } = React.useContext(UserContext);
+  const { type } = useParams("type");
+  const { allReportsOfUser, unblockUser, blockUser } =
+    React.useContext(UserContext);
   const [trigger, setTrigger] = useState(false);
-  const [comments, setComments] = useState("");
-  const [rating, setRating] = useState(0);
-  const [showRating, setShowRating] = useState(false);
   const [readyForReview, setReadyForReview] = useState([]);
-  const afterUnlock = () => {
-    setTrigger(!trigger);
-  };
-  //   const [user, setUser] = useState({});
-  //   const { GETCLIENTDETAILS } = endpoints;
-  //   useEffect(() => {
-  //     console.log(id);
-  //     getUserInfo();
-  //   }, []);
-
-  //   const getUserInfo = async () => {
-  //     const response = await apiConnector(
-  //       "get",
-  //       `${GETCLIENTDETAILS}/${id}`,
-  //       {},
-  //       "",
-  //       ""
-  //     ).then((res) => {
-  //       setUser(res.data?.user);
-  //       console.log(res);
-  //     });
-  //     console.log(response);
-  //   };
-  // my profile code paste
+  const [reportData, setReportData] = useState([]);
+  const [loading, setLoading] = useState(true); // Loading state
+  const [blockedState, setBlockedState] = useState(false);
 
   const {
     name,
     setName,
     response,
     getDetailsById,
-    getUnlockedUsers,
-    addRating,
     ReadyForRatingUsers,
     setResponse,
   } = useContext(UserContext);
-  const type = localStorage.getItem("type");
-  const [unlocked, setUnlocked] = useState([]);
+
+  const handelBlock = () => {
+    try {
+      if (blockedState) {
+        unblockUser(response?.data?.user?._id, response?.data?.user?.type);
+      } else {
+        blockUser(response?.data?.user?._id, response?.data?.user?.type);
+      }
+      setBlockedState(!blockedState);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     setResponse({});
-    if (type == "client") {
+    if (type === "client") {
       ReadyForRatingUsers().then(async (res) => {
-        console.log(await res);
         setReadyForReview(await res);
       });
-      getUnlockedUsers().then((res) => {
-        setUnlocked(res);
-      });
-      console.log("in Legalist search profile ");
       getDetailsById(id, "serviceProvider");
     } else {
-      console.log("in Client search  profile ");
       getDetailsById(id, "client");
-      console.log(response);
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    console.log(
-      response?.data?.user?.rating?.find(
-        (rating) => rating.customerId === localStorage.getItem("UserID")
-      )?.rating || 0
-    );
   }, [trigger]);
-  useEffect(() => {
-    console.log(readyForReview);
-    console.log(showRating);
-  });
-  useEffect(() => {
-    console.log(readyForReview);
-    if (readyForReview?.includes(response.data?.user?._id)) {
-      setShowRating(true);
-      console.log(readyForReview, response.data?.user?._id);
-    }
-    setRating(
-      response?.data?.user?.rating?.find(
-        (rating) => rating.customerId === localStorage.getItem("UserID")
-      )?.rating || 0
-    );
-    setComments(
-      response?.data?.user?.rating?.find(
-        (rating) => rating.customerId === localStorage.getItem("UserID")
-      )?.comment || ""
-    );
-  }, [readyForReview, response]);
 
-  const handelSubmit = async () => {
-    await addRating(response?.data?.user?._id, comments, rating);
-  };
+  useEffect(() => {
+    if (response?.data?.user?._id) {
+      setBlockedState(response?.data?.user?.blocked || false);
+      allReportsOfUser(response.data.user._id).then((data) => {
+        setReportData(data?.reports);
+        setLoading(false); // Set loading to false after data is fetched
+      });
+    }
+  }, [response]);
+
   const getInitials = () => {
     const words = response?.data?.user?.name?.split(" ") || " ";
     const firstNameInitial = words[0][0]?.toUpperCase();
     const lastNameInitial = words[words.length - 1][0]?.toUpperCase();
     return firstNameInitial + lastNameInitial;
   };
-  const getRating = () => {
-    const ratings = response?.data?.user?.rating || []; // Ensure ratings is an array
 
-    // Calculate the sum of all ratings
-    const sum = ratings.reduce((acc, rating) => acc + rating.rating, 0);
-
-    // Calculate the average
-    const average = sum / ratings.length;
-
-    // Round the average to 1 decimal point
-    const averageRounded = Math.round(average * 10) / 10;
-
-    return averageRounded || "no rating";
-  };
   return (
     <div className="w-11/12 flex-col justify-center mt-8">
-      <h1 className="text-3xl mb-8">
-        {" "}
-        {type == "client" ? "Legalist Profile" : "Client Profile"}
-      </h1>
+      <h1 className="text-3xl mb-8">Admin Profile View</h1>
 
       {/* Personal Information */}
       <Card className="w-[90%] md:p-16 p-5 md:flex md:justify-between ">
@@ -175,12 +117,7 @@ function ClientProfile() {
           </div>
           <div className="font-bold text-lg mt-4 md:mt-0">
             <h1 className="uppercase">Name: {response?.data?.user?.name}</h1>
-            <h1>
-              EMAIL:{" "}
-              {unlocked?.includes(response?.data?.user?._id)
-                ? response?.data?.user?.email
-                : "XXXXXXX@gmail.com"}
-            </h1>
+            <h1>EMAIL: {response?.data?.user?.email}</h1>
             <h1 className="uppercase">
               Account Type: {response?.data?.user?.type}
             </h1>
@@ -225,12 +162,7 @@ function ClientProfile() {
                 </div>
               </div>
               <DialogClose asChild>
-                <Button
-                  className="w-[30%] mx-auto"
-                  // onClick={() => setUserName(name)}
-                >
-                  Save changes
-                </Button>
+                <Button className="w-[30%] mx-auto">Save changes</Button>
               </DialogClose>
             </DialogContent>
           </Dialog>
@@ -276,25 +208,21 @@ function ClientProfile() {
             />
           </div>
 
-          {unlocked?.includes(response?.data?.user?._id) ? (
-            <div className="grid grid-cols-4 items-center gap-4 w-[100%] md:w-[50%]">
-              <Label
-                htmlFor="number"
-                className="text-right w-[100%] flex justify-center"
-              >
-                Contact Number
-              </Label>
-              <Input
-                id="number"
-                placeholder="Please enter your number..."
-                className="col-span-3 font-semibold"
-                readOnly
-                defaultValue={response?.data?.user?.phoneNumber}
-              />
-            </div>
-          ) : (
-            <></>
-          )}
+          <div className="grid grid-cols-4 items-center gap-4 w-[100%] md:w-[50%]">
+            <Label
+              htmlFor="number"
+              className="text-right w-[100%] flex justify-center"
+            >
+              Contact Number
+            </Label>
+            <Input
+              id="number"
+              placeholder="Please enter your number..."
+              className="col-span-3 font-semibold"
+              readOnly
+              defaultValue={response?.data?.user?.phoneNumber}
+            />
+          </div>
 
           <div className="grid grid-cols-4 items-center gap-4 w-[100%] md:w-[50%]">
             <Label
@@ -359,7 +287,7 @@ function ClientProfile() {
             />
           </div>
 
-          <div className="flex items-center gap-4 md:w-[50%] w-[100%]         gap-x-11">
+          <div className="flex items-center gap-4 md:w-[50%] w-[100%] gap-x-11">
             <Label
               htmlFor="about"
               className="text-right w-[20%] flex justify-center"
@@ -373,7 +301,7 @@ function ClientProfile() {
               className="md:w-[300px] w-[80%]"
             />
           </div>
-          {type == "client" ? (
+          {type === "client" ? (
             <></>
           ) : (
             <div className="grid grid-cols-4 items-center gap-4 w-[100%] md:w-[50%]">
@@ -391,63 +319,17 @@ function ClientProfile() {
               />
             </div>
           )}
-          {response?.data?.user?.rating ? (
-            <div className="grid grid-cols-4 items-center gap-4 w-[100%] md:w-[50%]">
-              <Label
-                htmlFor="jobs"
-                className="text-right w-[100%] flex justify-center"
-              >
-                Rating
-              </Label>
-              <span>
-                {" "}
-                {getRating()} <GradeIcon />
-              </span>
-            </div>
-          ) : (
-            <></>
-          )}
-          {type == "client" && showRating ? (
-            <div className="w-[100%] mx-auto border-[2px]">
-              <h1 className="flex justify-center">Rating</h1>
-              <div className="w-full">
-                <div className="w-full flex justify-evenly">
-                  <Input
-                    className="w-[40%] mb-4 mt-4"
-                    placeholder="Comments"
-                    value={comments}
-                    onChange={(e) => {
-                      setComments(e.target.value);
-                    }}
-                  />
-                  {console.log(response?.data?.user?.rating)}
-                  {console.log(localStorage.getItem("UserId"))}
-                  <HoverRating rating={rating} setRating={setRating} />{" "}
-                </div>
-                <div className="w-full flex justify-center mb-2">
-                  <Button
-                    onClick={() => {
-                      handelSubmit();
-                    }}
-                  >
-                    Submit Rating
-                  </Button>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <></>
-          )}
-          {type == "client" ? (
+
+          {type === "client" ? (
             <div className="w-[100%]">
               <div className="border-gray-200 border-[2px] mt-5">
-                {response?.data?.user?.pictures != 0 ? (
+                {response?.data?.user?.pictures?.length ? (
                   <Carousel>
                     <CarouselContent>
                       {response?.data?.user?.pictures?.map((imgSrc, index) => {
                         return (
                           <CarouselItem key={index}>
-                            <div className="relative group w-full h-full bg-black cursor-pointer ">
+                            <div className="relative group w-full h-full bg-black cursor-pointer">
                               <img
                                 width={300}
                                 height={300}
@@ -469,7 +351,7 @@ function ClientProfile() {
                   </Carousel>
                 ) : (
                   <div className="w-full flex justify-center text-gray-500">
-                    No Images Uploaded{" "}
+                    No Images Uploaded
                   </div>
                 )}
               </div>
@@ -477,79 +359,46 @@ function ClientProfile() {
           ) : (
             <></>
           )}
-
-          <div className="flex justify-center gap-4 w-[100%] mt-5  md:justify-end">
-            {/* experiment  */}
-
-            <Drawer>
-              <DrawerTrigger asChild>
-                <Button className="w-[15%]">
-                  <ReportIcon className="mr-2" />
-                  Report
-                </Button>
-              </DrawerTrigger>
-              <DrawerContent>
-                <DrawerHeader className="flex mx-auto flex-col">
-                  <DrawerTitle className="mx-auto">
-                    Report {response?.data?.user?.name}{" "}
-                  </DrawerTitle>
-                  <DrawerDescription>
-                    Why Do you want to report {response?.data?.user?.name} ?
-                  </DrawerDescription>
-                </DrawerHeader>
-                <div className="w-[50%] mx-auto">
-                  <Textarea
-                    placeholder="Type your reason here"
-                    className="min-h-[100px]"
-                    value={reason}
-                    onChange={(e) => {
-                      setReason(e.target.value);
-                    }}
-                  />
-                </div>
-
-                <DrawerClose asChild>
-                  <div className="w-[50%] flex mx-auto flex-col">
-                    <Button
-                      className="mt-5"
-                      onClick={() => {
-                        report(response?.data?.user?._id, reason);
-                        setReason("");
-                      }}
-                    >
-                      Submit
-                    </Button>
-                    <Button variant="outline" className="my-5">
-                      Close
-                    </Button>
-                  </div>
-                </DrawerClose>
-              </DrawerContent>
-            </Drawer>
-            {/* till here  */}
-            {type == "client" ? (
-              <>
-                <Button className="w-[15%]">Add to Favourite</Button>
-
-                {unlocked?.includes(response?.data?.user?._id) ? (
-                  <></>
-                ) : (
-                  <Button
-                    className="w-[15%]"
-                    onClick={() => {
-                      handelRazorpay(
-                        id,
-                        response?.data?.user?.name,
-                        afterUnlock
-                      );
-                    }}
-                  >
-                    Unlock
-                  </Button>
-                )}
-              </>
+          <div className="w-full flex justify-center flex-col items-center">
+            {loading ? (
+              <div>Loading reports...</div>
             ) : (
-              <></>
+              <>
+                <TableForReport rows={reportData} />
+
+                <AlertDialog>
+                  <AlertDialogTrigger className="w-full">
+                    <Button className="w-[15%]">
+                      <ReportIcon className="mr-2" />
+                      {blockedState ? "Unblobk" : "Block"}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Do you really want to{" "}
+                        {blockedState ? "unblobk" : "block"}{" "}
+                        {response?.data?.user?.name}
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        {blockedState
+                          ? "This user will be able to login if unblocked."
+                          : "This user will not be able to login if blocked."}
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => {
+                          handelBlock();
+                        }}
+                      >
+                        Continue
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </>
             )}
           </div>
         </div>
@@ -558,4 +407,4 @@ function ClientProfile() {
   );
 }
 
-export default ClientProfile;
+export default AdminProfileView;

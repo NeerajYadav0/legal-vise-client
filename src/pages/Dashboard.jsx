@@ -11,6 +11,11 @@ import AppliedJobs from "./AppliedJobs";
 import ClientProfile from "./ClientProfile";
 import Wishlist from "./Wishlist";
 import ClientProfilePage from "./ClientProfilePage";
+import SelectedJobs from "./SelectedJobs";
+import Favourite from "./Favourite";
+import ReportedUsers from "./ReportedUsers";
+import EducationalVideo from "./EducationalVideo";
+import AdminProfileView from "./AdminProfileView";
 function Dashboard() {
   const { selection } = useParams("selection");
   const getComp = () => {
@@ -36,6 +41,16 @@ function Dashboard() {
         return <ClientProfilePage />;
       case "search-legalist":
         return <ClientProfilePage />;
+      case "selected-jobs-page":
+        return <SelectedJobs />;
+      case "favourite":
+        return <Favourite />;
+      case "reportedUsers":
+        return <ReportedUsers />;
+      case "educational-video":
+        return <EducationalVideo />;
+      case "admin-profile-view":
+        return <AdminProfileView />;
 
       default:
         <Error />;

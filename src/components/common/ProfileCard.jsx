@@ -9,13 +9,16 @@ import {
 } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
+import { UserContext } from "@/context/UserContext";
 
-function ProfileCard({ user, type, fav }) {
+function ProfileCard({ user, type, fav: favorite }) {
   useEffect(() => {
-    console.log(fav);
-  }, []);
+    console.log(favorite);
+  });
+  const [fav, setFav] = useState(favorite);
   const navigate = useNavigate();
+  const { handelFav } = useContext(UserContext);
   //   const user = {
   //     _id: "65e6d961858c1487549a4f0f",
   //     name: "Neeraj Yadav",
@@ -96,7 +99,13 @@ function ProfileCard({ user, type, fav }) {
             View Profile
           </Button>
           {type == "client" ? (
-            <Button onClick={() => {}}>Add to Favourite</Button>
+            <Button
+              onClick={() => {
+                handelFav(setFav, user._id, fav);
+              }}
+            >
+              {fav ? "Remove Favourite" : "Add to Favourite"}
+            </Button>
           ) : (
             <></>
           )}

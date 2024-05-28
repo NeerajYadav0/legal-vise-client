@@ -45,8 +45,10 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
+import { State } from "country-state-city";
 
 function ViewJob() {
+  const states = State.getStatesOfCountry("IN");
   // test code
   const { getInterestedDetails, getUnlockedUsers, changeJobStatus } =
     useContext(UserContext);
@@ -206,7 +208,9 @@ function ViewJob() {
           <CardContent className=" grid gap-5">
             <div className="grid justify-between w-full items-center gap-4 text-gray-600">
               <div className="flex flex-col space-y-1.5">
-                State : {job.state}
+                State :{" "}
+                {states.find((state) => state.isoCode === job?.state)?.name ||
+                  job.state}
               </div>
               <div className="flex flex-col space-y-1.5">City : {job.city}</div>
               <div className="flex flex-col space-y-1.5">

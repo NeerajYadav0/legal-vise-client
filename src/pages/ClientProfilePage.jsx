@@ -20,8 +20,8 @@ function ClientProfilePage() {
     if (type == "client") {
       getFavLegalist()
         .then((data) => {
-          setFavServiceProvider(data);
           console.log(data); // Log the data received from the promise
+          setFavServiceProvider(data);
         })
         .catch((err) => {
           console.error("Error:", err); // Handle any errors

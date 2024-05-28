@@ -19,15 +19,34 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-
+import { State, City } from "country-state-city"; // Import State and City
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { TiTick } from "react-icons/ti";
 const CreateJob = () => {
+  const [categoryError, setCategoryError] = useState("");
+
+  const categoryList = [
+    "Lawyer",
+    "Notaries",
+    "Consultant",
+    "Mediator",
+    "Legal Researchers",
+    "Legal Document Preparer",
+    "Legal Translator",
+  ];
   const { createJob } = useContext(UserContext);
   const [files, setFiles] = useState([]);
   const [check, setCheck] = useState(false);
   const [formData, setFormData] = useState({
     jobName: "",
     jobDesc: "",
-    category: "",
+    category: [],
     jobLocation: "",
     state: "",
     city: "",
@@ -35,6 +54,27 @@ const CreateJob = () => {
     isActive: true,
     files: [],
   });
+  const [category, setCategory] = useState([]);
+  const handelCategory = (value) => {
+    let updatedCategory = [...category];
+    if (updatedCategory.includes(value)) {
+      // If the value is already present, remove it
+      updatedCategory = updatedCategory.filter((item) => item !== value);
+    } else {
+      // If the value is not present, add it
+      updatedCategory.push(value);
+    }
+    setCategory(updatedCategory);
+    setFormData((prevData) => ({
+      ...prevData,
+      category: updatedCategory,
+    }));
+    // Clear category error when a category is selected
+    setCategoryError("");
+  };
+
+  const states = State.getStatesOfCountry("IN"); // Get states
+  const cities = City.getCitiesOfState("IN", formData.state); // Get cities based on selected state
 
   const handleChange = (event) => {
     setCheck(true);
@@ -77,18 +117,37 @@ const CreateJob = () => {
     }));
   };
 
+  const handleStateChange = (e) => {
+    console.log(e);
+    setFormData((prevData) => ({
+      ...prevData,
+      state: e.target.value,
+      city: "", // Reset city when state changes
+    }));
+  };
+
+  const handleCityChange = (e) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      city: e.target.value,
+    }));
+  };
+
   const handleOnSubmit = async (e) => {
-    console.log(formData);
     e.preventDefault();
+    if (category.length === 0) {
+      setCategoryError("Category is required");
+      return;
+    }
+
     const id = localStorage.getItem("UserID");
-    console.log(id);
 
     try {
       await createJob(id, { ...formData, files });
       setFormData({
         jobName: "",
         jobDesc: "",
-        category: "",
+        category: [],
         jobLocation: "",
         state: "",
         city: "",
@@ -97,6 +156,7 @@ const CreateJob = () => {
         files: [],
       });
       setFiles([]);
+      setCategory([]);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -112,7 +172,7 @@ const CreateJob = () => {
                 <Label htmlFor="jobName">Name</Label>
                 <Input
                   id="jobName"
-                  placeholder="Name of Student"
+                  placeholder="Name of Job"
                   onChange={handleOnChange}
                   value={formData.jobName}
                   name="jobName"
@@ -124,7 +184,7 @@ const CreateJob = () => {
                 <Label htmlFor="rollNumber">Description</Label>
                 <Input
                   id="jobDesc"
-                  placeholder="Roll Number of Student"
+                  placeholder="Description of job"
                   onChange={handleOnChange}
                   value={formData.jobDesc}
                   name="jobDesc"
@@ -134,7 +194,10 @@ const CreateJob = () => {
 
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="category">Category</Label>
-                <Input
+                {categoryError && (
+                  <span className="text-red-500">{categoryError}</span>
+                )}
+                {/* <Input
                   id="category"
                   placeholder="Class of student"
                   type="text"
@@ -142,14 +205,39 @@ const CreateJob = () => {
                   value={formData.category}
                   name="category"
                   required
-                />
+                /> */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="text-black w-full">
+                      Category
+                    </Button>
+                  </DropdownMenuTrigger>
+
+                  <DropdownMenuContent className="w-full">
+                    {categoryList.map((value, index) => {
+                      return (
+                        <>
+                          <DropdownMenuItem
+                            key={index}
+                            onClick={() => {
+                              handelCategory(value);
+                            }}
+                          >
+                            {value} {category.includes(value) ? <TiTick /> : ""}
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                        </>
+                      );
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
 
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="section">Location</Label>
                 <Input
                   id="jobLocation"
-                  placeholder="Section of student"
+                  placeholder="Location explanation or landmark"
                   onChange={handleOnChange}
                   value={formData.jobLocation}
                   name="jobLocation"
@@ -159,23 +247,42 @@ const CreateJob = () => {
 
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="state">State</Label>
-                <Input
+                <select
                   id="state"
-                  onChange={handleOnChange}
+                  onChange={handleStateChange}
                   value={formData.state}
                   name="state"
-                />
+                  className="border outline-none p-2 text-black"
+                  required
+                >
+                  <option value="">Select State</option>
+                  {states.map((state) => (
+                    <option key={state.isoCode} value={state.isoCode}>
+                      {state.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="city">City</Label>
-                <Input
+                <select
                   id="city"
-                  onChange={handleOnChange}
+                  onChange={handleCityChange}
                   value={formData.city}
                   name="city"
-                />
+                  className="border outline-none p-2 text-black"
+                  required
+                >
+                  <option value="">Select City</option>
+                  {cities.map((city) => (
+                    <option key={city.isoCode} value={city.isoCode}>
+                      {city.name}
+                    </option>
+                  ))}
+                </select>
               </div>
+
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="jobPincode">Pin Code</Label>
                 <Input
@@ -183,6 +290,7 @@ const CreateJob = () => {
                   onChange={handleOnChange}
                   value={formData.jobPincode}
                   name="jobPincode"
+                  placeholder="Pincode"
                 />
               </div>
 
@@ -221,7 +329,7 @@ const CreateJob = () => {
               </div>
 
               <div className="flex flex-col space-y-1.5 mx-auto">
-                {files.length != 0 ? (
+                {files.length !== 0 ? (
                   <>
                     {console.log(files)}
                     <Carousel
@@ -234,8 +342,6 @@ const CreateJob = () => {
                       opts={{
                         align: "start",
                         loop: true,
-
-                        // interval={5000};
                       }}
                     >
                       <CarouselContent>
@@ -259,8 +365,14 @@ const CreateJob = () => {
                           );
                         })}
                       </CarouselContent>
-                      <CarouselPrevious className="text-white bg-gray-800 opacity-75 hover:opacity-100" />
-                      <CarouselNext className="text-white bg-gray-800 opacity-75 hover:opacity-100" />
+                      <CarouselPrevious
+                        className="text-white bg-gray-800 opacity-75 hover:opacity-100"
+                        onClick={(e) => e.preventDefault()}
+                      />
+                      <CarouselNext
+                        className="text-white bg-gray-800 opacity-75 hover:opacity-100"
+                        onClick={(e) => e.preventDefault()}
+                      />
                     </Carousel>
                   </>
                 ) : (

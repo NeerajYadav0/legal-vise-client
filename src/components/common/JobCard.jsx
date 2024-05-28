@@ -11,15 +11,22 @@ import { UserContext } from "@/context/UserContext";
 import { apiConnector } from "@/services/apiConnector";
 import { endpoints } from "@/services/apis";
 import { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { State } from "country-state-city";
 
 function JobCard(props) {
+  const states = State.getStatesOfCountry("IN");
+
+  const location = useLocation();
   const navigate = useNavigate();
   const [wishlist, setWishlist] = useState(false);
   const [alreadyApplied, setAlreadyApplied] = useState(false);
   const { job, index, differenceInDays, isActiveCondition } = props;
-  const { handelWishlist } = useContext(UserContext);
+  const { handelWishlist, handelConfirmation } = useContext(UserContext);
   const type = localStorage.getItem("type");
+  const [confirm, setConfirm] = useState(job.started);
+  console.log(job);
+
   useEffect(() => {
     getInfo();
   }, []);
@@ -40,6 +47,16 @@ function JobCard(props) {
     });
   };
 
+  const handelConfirm = async () => {
+    try {
+      await handelConfirmation(job._id, userID, setConfirm).then((res) => {
+        alert(`You confirmed ${job.jobName}`);
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <Card key={index} className={`w-[330px] mb-10  ${isActiveCondition}`}>
       <CardHeader>
@@ -48,7 +65,11 @@ function JobCard(props) {
       </CardHeader>
       <CardContent className=" grid gap-5">
         <div className="grid justify-between w-full items-center gap-4 text-gray-600">
-          <div className="flex flex-col space-y-1.5">State : {job.state}</div>
+          <div className="flex flex-col space-y-1.5">
+            State :{" "}
+            {states.find((state) => state.isoCode === job?.state)?.name ||
+              job.state}
+          </div>
           <div className="flex flex-col space-y-1.5">City : {job.city}</div>
           <div className="flex flex-col space-y-1.5">
             Created : {differenceInDays} Days ago
@@ -59,8 +80,18 @@ function JobCard(props) {
         </div>
       </CardContent>
       <CardFooter className="flex justify-between">
-        {type == "client" ? (
+        {type === "client" ? (
           <></>
+        ) : location.pathname.includes("/selected-jobs-page") ? (
+          <Button
+            disabled={confirm}
+            onClick={() => {
+              handelConfirm();
+            }}
+            variant="outline"
+          >
+            {!confirm ? "Confirm" : "Confirmed"}
+          </Button>
         ) : (
           <Button
             onClick={() => {

@@ -31,7 +31,7 @@ import {
 import { apiConnector } from "@/services/apiConnector";
 import { endpoints } from "@/services/apis";
 // import { useHistory } from "react-router-dom";
-
+import GradeIcon from "@mui/icons-material/Grade";
 function MyProfile() {
   // const history = useHistory();
   const [numberOfJobs, setNumeberOfJobs] = useState(0);
@@ -243,6 +243,21 @@ function MyProfile() {
         }
       });
     }
+  };
+
+  const getRating = () => {
+    const ratings = response?.data?.user?.rating || []; // Ensure ratings is an array
+
+    // Calculate the sum of all ratings
+    const sum = ratings.reduce((acc, rating) => acc + rating.rating, 0);
+
+    // Calculate the average
+    const average = sum / ratings.length;
+
+    // Round the average to 1 decimal point
+    const averageRounded = Math.round(average * 10) / 10;
+
+    return averageRounded;
   };
 
   return (
@@ -485,6 +500,23 @@ function MyProfile() {
                   readOnly
                   value={numberOfJobs}
                 />
+              </div>
+            ) : (
+              <></>
+            )}
+            {console.log(response?.data?.user?.rating)}
+            {response?.data?.user?.rating ? (
+              <div className="grid grid-cols-4 items-center gap-4 w-[100%] md:w-[50%]">
+                <Label
+                  htmlFor="jobs"
+                  className="text-right w-[100%] flex justify-center"
+                >
+                  Rating
+                </Label>
+                <span>
+                  {" "}
+                  {getRating()} <GradeIcon />
+                </span>
               </div>
             ) : (
               <></>

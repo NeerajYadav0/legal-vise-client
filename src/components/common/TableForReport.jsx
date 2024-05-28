@@ -24,6 +24,7 @@ import { visuallyHidden } from "@mui/utils";
 import { Button } from "@/components/ui/button";
 import { UserContext } from "@/context/UserContext";
 import { useNavigate } from "react-router-dom";
+import { formattedDate } from "@/utils/dateFormatter";
 // function createData(id, name, calories, fat, carbs, protein) {
 //   return {
 //     id,
@@ -51,11 +52,11 @@ import { useNavigate } from "react-router-dom";
 //   createData(13, "Oreo", 437, 18.0, 63, 4.0),
 // ];
 
-function createData(id, name, comments, priceRange) {
+function createData(id, name, comments, date) {
   return {
     name,
     comments,
-    priceRange,
+    date,
     id,
   };
 }
@@ -97,7 +98,7 @@ const headCells = [
     id: "name",
     numeric: false,
     disablePadding: true,
-    label: "Legalist Name",
+    label: "User Name",
   },
   {
     id: "comments",
@@ -106,22 +107,10 @@ const headCells = [
     label: "comments",
   },
   {
-    id: "priceRange",
+    id: "date",
     numeric: false,
     disablePadding: false,
-    label: "Price Range",
-  },
-  {
-    id: "Action",
-    numeric: false,
-    disablePadding: false,
-    label: "Action",
-  },
-  {
-    id: "Select",
-    numeric: false,
-    disablePadding: false,
-    label: "Select for job",
+    label: "Date",
   },
 ];
 
@@ -224,7 +213,7 @@ function EnhancedTableToolbar(props) {
           id="tableTitle"
           component="div"
         >
-          Applications
+          Report Details
         </Typography>
       )}
 
@@ -266,26 +255,7 @@ EnhancedTableToolbar.propTypes = {
 //   //     createData(15, "Neeraj Yadav", "i am a very good lawyer", "1000-2000"),
 // ];
 // var rows = [];
-export default function EnhancedTable({
-  interested,
-  rows,
-  getUnlocked,
-  jobId,
-  selectedUserId,
-}) {
-  const [selectedId, setSelectedId] = React.useState("");
-  React.useEffect(() => {
-    console.log(selectedUserId);
-    setSelectedId(selectedUserId);
-  }, []);
-  const handelSelect = async (serviceProviderId) => {
-    return await selectJob(jobId, serviceProviderId).then((data) => {
-      alert("Successfully selected a user");
-      return data;
-    });
-  };
-  const { selectJob } = React.useContext(UserContext);
-  const { handelRazorpay } = React.useContext(UserContext);
+export default function TableForReport({ rows }) {
   //   var [rows, setRows] = React.useState([]);
   const navigate = useNavigate();
   React.useEffect(() => {
@@ -310,34 +280,6 @@ export default function EnhancedTable({
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
-  };
-
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelected = rows.map((n) => n.id);
-      setSelected(newSelected);
-      return;
-    }
-    setSelected([]);
-  };
-
-  const handleClick = (event, id) => {
-    const selectedIndex = selected.indexOf(id);
-    let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-    setSelected(newSelected);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -367,10 +309,6 @@ export default function EnhancedTable({
       ),
     [order, orderBy, page, rowsPerPage]
   );
-
-  const handelPayment = (id, name) => {
-    handelRazorpay(id, name, getUnlocked);
-  };
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -422,42 +360,11 @@ export default function EnhancedTable({
                       padding="none"
                       align="center"
                     >
-                      {row.name}
+                      {row.reportedByName}
                     </TableCell>
                     <TableCell align="center">{row.comments}</TableCell>
-                    <TableCell align="center">{row.approxAmount}</TableCell>
                     <TableCell align="center">
-                      {" "}
-                      <Button
-                        className=" w-24 text-sm"
-                        onClick={() => {
-                          if (row?.unlocked) {
-                            navigate(`/dashboard/user-profile/${row.id}`);
-                          } else {
-                            const addToUnlocked = () => {
-                              row.unlocked = true;
-                            };
-                            handelPayment(row.id, row.name, addToUnlocked);
-                          }
-                        }}
-                      >
-                        {row?.unlocked ? "View Profile" : "Unlock"}
-                      </Button>
-                    </TableCell>
-                    <TableCell align="center">
-                      {" "}
-                      <Button
-                        className=" w-24 text-sm"
-                        onClick={() => {
-                          if (handelSelect(row.id)) {
-                            console.log("entered");
-                            setSelectedId(row.id);
-                          }
-                        }}
-                        disabled={row?.unlocked !== true || selectedId !== ""}
-                      >
-                        {selectedId == row?.id ? "Selected" : "Select"}
-                      </Button>
+                      {formattedDate(row.createdAt)}
                     </TableCell>
                   </TableRow>
                 );

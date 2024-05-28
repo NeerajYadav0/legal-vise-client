@@ -6,6 +6,7 @@ import { VscDashboard, VscSignOut } from "react-icons/vsc";
 import { Link, useNavigate } from "react-router-dom";
 
 const ProfileDropdown = () => {
+  const type = localStorage.getItem("type");
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const { name, updateToken } = useContext(UserContext);
@@ -34,19 +35,30 @@ const ProfileDropdown = () => {
   return (
     <div ref={dropdownRef}>
       <div className="relative">
-        <Avatar className="cursor-pointer" onClick={() => setOpen(!open)}>
-          {/* <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" /> */}
-          <AvatarFallback>{getInitials()}</AvatarFallback>
-        </Avatar>
+        {type != "admin" ? (
+          <Avatar className="cursor-pointer" onClick={() => setOpen(!open)}>
+            {/* <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" /> */}
+            <AvatarFallback>{getInitials()}</AvatarFallback>
+          </Avatar>
+        ) : (
+          <span className="cursor-pointer" onClick={() => setOpen(!open)}>
+            Admin
+          </span>
+        )}
       </div>
       {open && (
         <div className="absolute top-[3%] right-20 z-[1000] divide-y-[1px] divide-slate-800 overflow-hidden rounded-md border-[1px] border-slate-800 bg-slate-800">
-          <Link to="/dashboard/my-profile" onClick={() => setOpen(false)}>
-            <div className="flex w-full items-center gap-x-1 py-[10px] px-[12px] text-sm text-yellow-100 hover:bg-slate-800 hover:text-yellow-25">
-              <VscDashboard className="text-lg" />
-              Dashboard
-            </div>
-          </Link>
+          {type != "admin" ? (
+            <Link to="/dashboard/my-profile" onClick={() => setOpen(false)}>
+              <div className="flex w-full items-center gap-x-1 py-[10px] px-[12px] text-sm text-yellow-100 hover:bg-slate-800 hover:text-yellow-25">
+                <VscDashboard className="text-lg" />
+                Dashboard
+              </div>
+            </Link>
+          ) : (
+            <></>
+          )}
+
           <div
             onClick={() => {
               localStorage.removeItem("token");
