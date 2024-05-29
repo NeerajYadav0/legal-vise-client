@@ -1,5 +1,5 @@
-const BASE_URL = "http://localhost:8000/api/";
-// const BASE_URL = "https://legal-vise-server.vercel.app/api/";
+// const BASE_URL = "http://localhost:8000/api/";
+const BASE_URL = "https://legal-vise-server.vercel.app/api/";
 
 // AUTH ENDPOINTS
 export const endpoints = {
