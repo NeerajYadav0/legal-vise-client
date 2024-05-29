@@ -272,12 +272,16 @@ export default function EnhancedTable({
   getUnlocked,
   jobId,
   selectedUserId,
+  trigger,
+  setTrigger,
 }) {
   const [selectedId, setSelectedId] = React.useState("");
+
   React.useEffect(() => {
     console.log(selectedUserId);
     setSelectedId(selectedUserId);
   }, []);
+
   const handelSelect = async (serviceProviderId) => {
     return await selectJob(jobId, serviceProviderId).then((data) => {
       alert("Successfully selected a user");
@@ -368,8 +372,13 @@ export default function EnhancedTable({
     [order, orderBy, page, rowsPerPage]
   );
 
-  const handelPayment = (id, name) => {
-    handelRazorpay(id, name, getUnlocked);
+  const handelPayment = async (id, name) => {
+    await handelRazorpay(id, name, afterUnlock);
+    // setTrigger(!trigger);
+  };
+
+  const afterUnlock = () => {
+    setTrigger(!trigger);
   };
 
   return (

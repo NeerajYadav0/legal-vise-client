@@ -397,6 +397,7 @@ export default function UserContextProvider({ children }) {
   const changePassword = async (currentPassword, newPassword) => {
     try {
       const userId = localStorage.getItem("UserID");
+      const type = localStorage.getItem("type");
       let response = {};
       if (type == "client") {
         await apiConnector("POST", CUSTOMER_PASSWORD_CHANGE, {

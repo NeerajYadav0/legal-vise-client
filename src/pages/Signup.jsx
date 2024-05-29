@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import reactToast from "react-hot-toast";
 
 function Signup() {
   const navigate = useNavigate();
@@ -28,11 +29,13 @@ function Signup() {
     register: cregister,
     handleSubmit: chandleSubmit,
     getValues: cgetValues,
+    formState: { cerrors },
   } = useForm();
   const {
     register: vregister,
     handleSubmit: vhandleSubmit,
     getValues: vgetValues,
+    formState: { verrors },
   } = useForm();
   const [isOTP, setIsOTP] = useState(false);
 
@@ -165,6 +168,21 @@ function Signup() {
     console.log(category);
     console.log("====================================");
   };
+
+  const validatePassword = (value) => {
+    if (!value) {
+      return "Password is required";
+    }
+    if (value.length < 8) {
+      reactToast.info("Password must be at least 8 characters long");
+      return "Password must be at least 8 characters long";
+    }
+    // Add more validation rules as needed
+    return true;
+  };
+
+  const cpasswordError = cerrors?.password ? cerrors?.password.message : null;
+  const vpasswordError = verrors?.password ? verrors?.password.message : null;
 
   return (
     <div className=" h-auto md:h-[90%]">
@@ -300,10 +318,18 @@ function Signup() {
                                 required
                                 className="text-black"
                                 name="password"
-                                {...cregister("password")}
+                                {...cregister("password", {
+                                  validate: validatePassword,
+                                })}
                                 // className="bg-gray-400 border border-white text-white placeholder-white text-sm rounded-lg block w-full p:1  md:p-1.5"
                                 placeholder="Enter your password"
                               />
+                              {cpasswordError && (
+                                <span className="text-red-500">
+                                  {cpasswordError}
+                                </span>
+                              )}
+
                               {/* <p className="mt-2 text-sm text-green-600 dark:text-green-500">
                       <span className="font-medium">Well done!</span> Some
                       success message.
@@ -460,12 +486,21 @@ function Signup() {
                               <Input
                                 name="password"
                                 required
-                                {...vregister("password")}
+                                {...vregister("password", {
+                                  validate: validatePassword,
+                                })}
                                 type="text"
                                 className="text-black"
                                 // className="bg-gray-400 border border-white text-white placeholder-white text-sm rounded-lg block w-full p:1  md:p-1.5"
                                 placeholder="Enter your password"
                               />
+
+                              {vpasswordError && (
+                                <span className="text-red-500">
+                                  {vpasswordError}
+                                </span>
+                              )}
+
                               {/* <p className="mt-2 text-sm text-green-600 dark:text-green-500">
                       <span className="font-medium">Well done!</span> Some
                       success message.
