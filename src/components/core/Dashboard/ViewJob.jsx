@@ -49,55 +49,87 @@ import { State } from "country-state-city";
 
 function ViewJob() {
   const states = State.getStatesOfCountry("IN");
+  // test code
   const { getInterestedDetails, getUnlockedUsers, changeJobStatus } =
     useContext(UserContext);
-  const [rows, setRows] = useState([]);
-  const [unlocked, setUnlocked] = useState([]);
+  var [rows, setRows] = useState([]);
+  var [unlocked, setUnlocked] = useState([]);
+
+  // test code ends
+
   const [job, setJob] = useState({});
   const [alreadyApplied, setAlreadyApplied] = useState(false);
   const [wishlist, setWishlist] = useState(false);
   const [showTable, setShowTable] = useState(false);
   const [trigger, setTrigger] = useState(false);
-  const [loading, setLoading] = useState(true); // Loading state
-  const [status, setStatus] = useState(true);
-  const [selectedPrice, setSelectedPrice] = useState();
-  const [comments, setComments] = useState("");
-  const type = localStorage.getItem("type");
-  const userID = localStorage.getItem("UserID");
-  const { id } = useParams("id");
-  const jobId = id;
-  const { APPLYJOB, GETONEJOB, CHECKINTERESTED } = endpoints;
-  const { handelWishlist } = useContext(UserContext);
-  const navigate = useNavigate();
-
   useEffect(() => {
     getUnlocked();
     getJob();
+    console.log(type);
   }, [trigger]);
 
   useEffect(() => {
-    if (job && unlocked.length) {
-      getDetails();
-    }
+    getDetails();
+    // console.log(unlocked);
   }, [job, unlocked]);
+
+  useEffect(() => {
+    console.log(" in trigger");
+  }, [trigger]);
 
   const getDetails = async () => {
     await getInterestedDetails(job?.interested, unlocked).then((res) => {
       setRows(res.data);
-      setLoading(false); // Set loading to false once data is loaded
     });
   };
-
   const getUnlocked = async () => {
     await getUnlockedUsers().then((res) => {
       setUnlocked(res);
     });
   };
 
+  const { id } = useParams("id");
+  const jobId = id;
+  const { APPLYJOB, GETONEJOB, CHECKINTERESTED } = endpoints;
+  const { handelWishlist } = useContext(UserContext);
+  const [status, setStatus] = useState(true);
+  const type = localStorage.getItem("type");
+
+  const navigate = useNavigate();
+  const [selectedPrice, setSelectedPrice] = useState();
+  const [comments, setComments] = useState("");
+  const userID = localStorage.getItem("UserID");
+  // const job = {
+  //   _id: "65c8bc08841b8681b472e8f3",
+  //   customerId: "65bcc4579c3fa84c53aebdc4",
+  //   jobName: "get to know a law document",
+  //   jobDesc: "i want to understand a file and to take some suggestions",
+  //   category: ["litigation understanding"],
+  //   isActive: false,
+  //   jobPincode: 122101,
+  //   jobLocation: "gurugram",
+  //   pictures: [""],
+  //   state: "haryana",
+  //   city: "gurugram",
+  //   createdOn: "2024-02-11T12:22:32.774Z",
+  //   interested: [
+  //     {
+  //       serviceProviderId: "65bcc9cc165532df06b2c3b4",
+  //       approxAmount: "4",
+  //       comments: "i can do this job in 2 sittings",
+  //     },
+  //     {
+  //       serviceProviderId: "65c906a3687541bd8567febf",
+  //       approxAmount: "5",
+  //       comments: "i can do this job in 2 sittings",
+  //     },
+  //   ],
+  // };
   const getJob = async () => {
-    setLoading(true); // Set loading to true when fetching data
     await apiConnector("get", `${GETONEJOB}/${jobId}`, {}, "", "").then(
       (res) => {
+        // setJob(res.data?.job);
+        console.log(res.data.job);
         setJob(res.data.job);
         setStatus(res?.data?.job?.isActive);
       }
@@ -113,11 +145,16 @@ function ViewJob() {
       setWishlist(res.data?.wishlist);
     });
   };
+  const creationDate = new Date(job.createdOn);
+  const differenceInMilliseconds = Date.now() - creationDate;
+  const differenceInDays = Math.floor(
+    differenceInMilliseconds / (1000 * 60 * 60 * 24)
+  );
 
   const applyJob = async () => {
     try {
       if (selectedPrice == undefined || comments == "") {
-        toast.error("All Fields are required");
+        toast.error("All Fieds are required");
       } else {
         await apiConnector(
           "post",
@@ -143,19 +180,9 @@ function ViewJob() {
   const changeStatus = () => {
     setStatus(!status);
     changeJobStatus(job?._id).then(() => {
-      toast.success("Job status changed");
+      toast.success("Job status changes");
     });
   };
-
-  const creationDate = new Date(job.createdOn);
-  const differenceInMilliseconds = Date.now() - creationDate;
-  const differenceInDays = Math.floor(
-    differenceInMilliseconds / (1000 * 60 * 60 * 24)
-  );
-
-  if (loading) {
-    return <div>Loading...</div>; // Show loading indicator while data is being fetched
-  }
 
   return (
     <div className="w-11/12 flex-col justify-center mt-8">
@@ -203,11 +230,12 @@ function ViewJob() {
             </div>
           </CardContent>
           <CardFooter className="flex justify-between">
-            {type === "client" ? (
-              <div className="w-full">
+            {type == "client" ? (
+              <div className=" w-full">
                 <div className="flex justify-between">
+                  {" "}
                   <Button
-                    className="mb-4"
+                    className=" mb-4"
                     variant="outline"
                     onClick={() => {
                       setShowTable(!showTable);
@@ -228,6 +256,7 @@ function ViewJob() {
 
                 {showTable ? (
                   <div>
+                    {/* <Table /> */}
                     <EnhancedTable
                       interested={job?.interested}
                       rows={rows}
@@ -238,7 +267,9 @@ function ViewJob() {
                       trigger={trigger}
                     />
                   </div>
-                ) : null}
+                ) : (
+                  <></>
+                )}
               </div>
             ) : (
               <>
@@ -258,10 +289,19 @@ function ViewJob() {
                 >
                   View Customer Profile
                 </Button>
-
+                {/* <Button
+              variant="outline"
+              onClick={() => {
+                navigate(`/dashboard/viewJob/${job._id}`);
+              }}
+            >
+              Apply
+            </Button> */}
+                {/* drawer start */}
                 <Drawer>
                   <DrawerTrigger disabled={alreadyApplied || !job?.isActive}>
                     <Button variant="outline">
+                      {" "}
                       {alreadyApplied
                         ? "Already Applied"
                         : job?.isActive
@@ -281,80 +321,108 @@ function ViewJob() {
                         <h1 className="pb-5 md:p-0">Approx Amount</h1>
                         <div className="pb-5 md:p-0">
                           <DropdownMenu>
-                            <DropdownMenuTrigger>
+                            <DropdownMenuTrigger asChild>
                               <Button variant="outline">
-                                {selectedPrice
-                                  ? selectedPrice
-                                  : "Select Approx Amount"}
+                                {selectedPrice || "Select"}
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent>
+                            <DropdownMenuContent className="w-56">
                               <DropdownMenuLabel>
-                                Select Amount
+                                Approx Amount
                               </DropdownMenuLabel>
                               <DropdownMenuSeparator />
                               <DropdownMenuGroup>
                                 <DropdownMenuItem
-                                  onClick={() => setSelectedPrice(500)}
+                                  onClick={() => {
+                                    setSelectedPrice("Rs 0 - Rs 1000");
+                                  }}
+                                  className="cursor-pointer"
                                 >
-                                  ₹ 500
+                                  Rs 0 - Rs 1000
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                  onClick={() => setSelectedPrice(1000)}
+                                  onClick={() => {
+                                    setSelectedPrice("Rs 1001 - Rs 5000");
+                                  }}
+                                  className="cursor-pointer"
                                 >
-                                  ₹ 1000
+                                  Rs 1001 - Rs 5000
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                  onClick={() => setSelectedPrice(1500)}
+                                  onClick={() => {
+                                    setSelectedPrice("Rs 5001 - Rs 10,000");
+                                  }}
+                                  className="cursor-pointer"
                                 >
-                                  ₹ 1500
+                                  Rs 5001 - Rs 10,000
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                  onClick={() => setSelectedPrice(2000)}
+                                  onClick={() => {
+                                    setSelectedPrice("Rs 10,001 - Rs 20,000");
+                                  }}
+                                  className="cursor-pointer"
                                 >
-                                  ₹ 2000
+                                  Rs 10,001 - Rs 20,000
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setSelectedPrice("Rs 20,001 - Rs 50,000");
+                                  }}
+                                  className="cursor-pointer"
+                                >
+                                  Rs 20,001 - Rs 50,000
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setSelectedPrice("Rs 50,001 - Rs 1,00,000");
+                                  }}
+                                  className="cursor-pointer"
+                                >
+                                  Rs 50,001 - Rs 1,00,000
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setSelectedPrice("Rs 1,00,000 - Above");
+                                  }}
+                                  className="cursor-pointer"
+                                >
+                                  Rs 1,00,000 - Above
                                 </DropdownMenuItem>
                               </DropdownMenuGroup>
+                              <DropdownMenuSeparator />
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
                       </div>
-                      <div className="md:flex-row flex flex-col items-center">
-                        <h1 className="pb-5 md:p-0">Add Comments</h1>
+                      <div className="flex flex-col  items-center">
+                        <h1 className="pb-5 md:p-0">Comments</h1>
                         <Textarea
-                          className=" md:mx-5"
-                          placeholder="Type your message here."
+                          className="pb-5 md:p-0 border"
+                          id="approx-amount"
+                          type="text"
+                          value={comments}
                           onChange={(e) => setComments(e.target.value)}
                         />
                       </div>
                     </div>
                     <DrawerFooter>
-                      <DrawerClose asChild>
-                        <Button
-                          variant="outline"
-                          onClick={() => {
-                            setSelectedPrice();
-                            setComments("");
-                          }}
-                        >
+                      <DrawerClose>
+                        <Button className="w-full" onClick={applyJob}>
+                          Submit
+                        </Button>
+                        <Button className="w-full" variant="outline">
                           Cancel
                         </Button>
                       </DrawerClose>
-                      <Button
-                        type="submit"
-                        variant="outline"
-                        onClick={applyJob}
-                      >
-                        Apply
-                      </Button>
                     </DrawerFooter>
                   </DrawerContent>
                 </Drawer>
+
+                {/* drawer end */}
               </>
             )}
           </CardFooter>
         </Card>
-
         <Drawer>
           <DrawerTrigger asChild>
             <div className=" relative w-[30%] h-[300px] flex hover:scale-110 duration-500">
